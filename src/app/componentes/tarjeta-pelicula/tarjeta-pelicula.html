@@ -1,0 +1,39 @@
+<div class="tarjeta" *ngIf="pelicula">
+
+  <div class="imagen-wrapper">
+    <img [src]="pelicula.imagen" [alt]="pelicula.nombre">
+    
+    <div class="etiquetas">
+      <span class="edad" *ngIf="pelicula.restriccion_edad">+{{ pelicula.restriccion_edad }}</span>
+      <span class="edad atp" *ngIf="!pelicula.restriccion_edad">ATP</span>
+    </div>
+  </div>
+
+  <div class="contenido">
+    <h3 class="titulo">{{ pelicula.nombre }}</h3>
+    
+    <div class="info-tecnica">
+      <span>⏳ {{ pelicula.duracion }} min</span>
+      <span>📅 {{ pelicula.fecha_estreno | date:'dd/MM/yy' }}</span>
+    </div>
+
+
+    <div class="generos">
+      <span class="badge" *ngFor="let genero of pelicula.generos | slice:0:3">
+        {{ genero }}
+      </span>
+      <span class="badge extra" *ngIf="pelicula.generos.length > 3">
+        +{{ pelicula.generos.length - 3 }}
+      </span>
+    </div>
+
+    <p class="sinopsis">{{ pelicula.sinopsis }}</p>
+    
+    <div class="footer-tarjeta">
+      <div class="precios">
+        <span class="precio-base">${{ pelicula.precio_base }}</span>
+      </div>
+      <button class="btn-comprar">Ver Funciones</button>
+    </div>
+  </div>
+</div>

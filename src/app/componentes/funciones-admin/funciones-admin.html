@@ -1,0 +1,73 @@
+<div class="funciones-contenedor">
+  <div class="header">
+  <button id="boton-atras" routerLink="/admin">
+    &#8592; Atrás 
+  </button>
+<!-- Resultado: ← Atrás -->
+
+<!-- O con un emoji si prefieres: ⬅ Atrás -->
+  <h2>Programación Recurrente de Funciones y Salas</h2></div>
+
+  <p class="alerta error" *ngIf="mensajeError()">{{ mensajeError() }}</p>
+  <p class="alerta exito" *ngIf="mensajeExito()">{{ mensajeExito() }}</p>
+
+  <form [formGroup]="funcionForm" (ngSubmit)="programarFuncionesRecurrentes()" class="form-panel">
+    
+    <div class="campo">
+      <label>Película</label>
+      <select formControlName="pelicula_id">
+        <option value="" disabled>Seleccione una película</option>
+        <option *ngFor="let p of peliculas()" [value]="p.id">{{ p.nombre }} ({{ p.duracion }} min)</option>
+      </select>
+    </div>
+
+    <div class="grid-2">
+      <div class="campo">
+        <label>Hora de Proyección</label>
+        <input type="time" formControlName="hora_inicio">
+      </div>
+      <div class="campo">
+        <label>Fecha de Inicio (Desde cuándo)</label>
+        <input type="date" formControlName="fecha_inicio_recurrencia">
+      </div>
+    </div>
+
+    <div class="campo">
+      <label>Duración de la Repetición (Semanas)</label>
+      <input type="number" formControlName="semanas_duracion" min="1" max="12">
+    </div>
+
+    <!-- Selección de Días de la Semana -->
+    <div class="campo" formGroupName="dias_semana">
+      <label>Días de la semana en que se proyectará:</label>
+      <div class="checkboxes-dias">
+        <label><input type="checkbox" formControlName="1"> Lunes</label>
+        <label><input type="checkbox" formControlName="2"> Martes</label>
+        <label><input type="checkbox" formControlName="3"> Miércoles</label>
+        <label><input type="checkbox" formControlName="4"> Jueves</label>
+        <label><input type="checkbox" formControlName="5"> Viernes</label>
+        <label><input type="checkbox" formControlName="6"> Sábados</label>
+        <label><input type="checkbox" formControlName="0"> Domingos</label>
+      </div>
+    </div>
+
+    <button type="submit" [disabled]="cargando()">
+      {{ cargando() ? 'Procesando y Asignando Salas...' : 'Generar Funciones Recurrentes' }}
+    </button>
+  </form>
+
+  <div class="listado-funciones">
+    <h3>Funciones Programadas ({{ funciones().length }})</h3>
+    <ul>
+      <li *ngFor="let f of funciones()">
+        <div class="info-funcion">
+          <div>
+            <strong>{{ f.peliculas?.nombre }}</strong> - <span class="sala-badge">{{ f.salas?.nombre }}</span>
+          </div>
+          <button type="button" class="btn-eliminar-funcion" (click)="eliminarFuncion(f.id)" title="Eliminar función">×</button>
+        </div>
+        <small>Inicio: {{ f.fecha_hora_inicio | date:'medium' }} | Fin (con intervalo): {{ f.fecha_hora_fin | date:'shortTime' }}</small>
+      </li>
+    </ul>
+  </div>
+</div>

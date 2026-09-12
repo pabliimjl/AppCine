@@ -1,0 +1,51 @@
+<div class="dashboard-contenedor">
+  <h2>Panel de Control - Administración</h2>
+  <p class="subtitulo">Selecciona una sección para gestionar el contenido del cine.</p>
+
+  <!-- Métricas Rápidas -->
+  <div class="metricas-grid">
+    <div class="metrica-card">
+      <span class="numero">{{ totalPeliculas() }}</span>
+      <span class="etiqueta">Películas</span>
+    </div>
+    <div class="metrica-card">
+      <span class="numero">{{ totalFunciones() }}</span>
+      <span class="etiqueta">Funciones Programadas</span>
+    </div>
+    <div class="metrica-card">
+      <span class="numero">{{ totalProductos() }}</span>
+      <span class="etiqueta">Productos Candy</span>
+    </div>
+    <div class="metrica-card">
+      <span class="numero">{{ totalCombos() }}</span>
+      <span class="etiqueta">Combos</span>
+    </div>
+  </div>
+
+  <!-- Botones de Navegación -->
+  <div class="acciones-grid">
+    <a routerLink="/admin/peliculas" class="accion-card peliculas">
+      <div class="icono">🎬</div>
+      <div class="info">
+        <h3>Gestionar Películas</h3>
+        <p>Agregar películas, formatos, idiomas, géneros y sinopsis.</p>
+      </div>
+    </a>
+
+    <a routerLink="/admin/funciones" class="accion-card funciones">
+      <div class="icono">📅</div>
+      <div class="info">
+        <h3>Gestionar Funciones</h3>
+        <p>Programar horarios y asignación automática de salas con intervalo.</p>
+      </div>
+    </a>
+
+    <a routerLink="/admin/candy" class="accion-card candy">
+      <div class="icono">🍿</div>
+      <div class="info">
+        <h3>Gestionar Candy Bar</h3>
+        <p>Cargar productos individuales, categorías y combos especiales.</p>
+      </div>
+    </a>
+  </div>
+</div>

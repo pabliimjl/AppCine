@@ -1,0 +1,140 @@
+.contenedor-login {
+  width: 100%;
+  max-width: 400px;
+  box-sizing: border-box; /* Previene desbordamientos en pantallas pequeñas */
+  
+  /* 1. Adaptación móvil y Safe Areas */
+  margin: 20px auto; 
+  margin-top: max(20px, env(safe-area-inset-top)); /* Respeta el notch del dispositivo */
+  padding: 24px;
+  
+  background-color: #1c1c1e;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+
+  /* Recupera tu estilo original en tablets/escritorio */
+  @media (min-width: 480px) {
+    margin: 60px auto;
+    padding: 32px;
+  }
+
+  h2 {
+    margin: 0 0 24px 0;
+    font-size: 1.8rem;
+    text-align: center;
+    color: #ffffff;
+  }
+
+  .alerta.error {
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 20px;
+    background-color: rgba(255, 64, 129, 0.1);
+    color: #ff4081;
+    border: 1px solid rgba(255, 64, 129, 0.3);
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    input {
+      width: 100%;
+      background-color: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+      padding: 14px 16px;
+      border-radius: 8px;
+      
+      /* 2. Fix de iOS Safari: Debe ser de al menos 16px para evitar el auto-zoom indeseado */
+      font-size: 16px; 
+      
+      outline: none;
+      box-sizing: border-box;
+      
+      /* 3. Normalización nativa */
+      -webkit-appearance: none;
+      appearance: none;
+
+      &::placeholder {
+        color: #666666;
+      }
+
+      &:focus {
+        border-color: #ff4081;
+        box-shadow: 0 0 0 2px rgba(255, 64, 129, 0.2);
+      }
+    }
+
+    button {
+      margin-top: 16px;
+      background-color: #ff4081;
+      color: white;
+      border: none;
+      
+      /* 4. Área táctil recomendada para móviles (mínimo 44px/48px) */
+      min-height: 48px;
+      padding: 14px;
+      
+      border-radius: 8px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.2s ease, transform 0.1s ease;
+      
+      /* 5. Comportamiento táctil de app nativa */
+      -webkit-appearance: none;
+      appearance: none;
+      touch-action: manipulation; /* Evita el retraso de 300ms al tocar (doble tap zoom) */
+      -webkit-tap-highlight-color: transparent; /* Quita el destello de selección azul en Android/iOS */
+      user-select: none; /* Evita que el usuario seleccione el texto del botón al mantenerlo presionado */
+
+      &:hover:not(:disabled) {
+        background-color: #f50057;
+      }
+
+      /* Efecto de hundimiento rápido para dar feedback de toque en pantallas táctiles */
+      &:active:not(:disabled) {
+        transform: scale(0.97);
+      }
+
+      &:disabled {
+        background-color: #555555;
+        color: #aaaaaa;
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  .footer-link {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 0.9rem;
+    color: #aaaaaa;
+    
+    /* 6. Respeta la barra de navegación gestual de iOS/Android en el borde inferior */
+    padding-bottom: env(safe-area-inset-bottom);
+
+    a {
+      color: #ff4081;
+      text-decoration: none;
+      font-weight: bold;
+      
+      /* Expande ligeramente el área táctil del enlace */
+      padding: 8px;
+      display: inline-block;
+      -webkit-tap-highlight-color: transparent;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}

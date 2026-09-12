@@ -1,0 +1,89 @@
+<div class="admin-contenedor">
+  <div class="header">
+  <button id="boton-atras" routerLink="/admin">
+    &#8592; Atrás 
+  </button>
+  <h2>Gestión de Peliculas</h2></div>  
+
+  <!-- Mensajes de Estado -->
+  <p class="alerta error" *ngIf="mensajeError()">{{ mensajeError() }}</p>
+  <p class="alerta exito" *ngIf="mensajeExito()">{{ mensajeExito() }}</p>
+
+  <!-- Formulario de Alta de Películas -->
+  <form [formGroup]="peliculaForm" (ngSubmit)="guardarPelicula()" class="admin-form">
+    <h3>Registrar Nueva Película</h3>
+
+    <div class="grid-2">
+      <div class="campo">
+        <label>Título de la Película</label>
+        <input type="text" formControlName="nombre" placeholder="Ej: Batman">
+      </div>
+      <div class="campo">
+        <label>URL del Póster (Imagen)</label>
+        <input type="text" formControlName="imagen" placeholder="https://...">
+      </div>
+    </div>
+
+    <div class="campo">
+        <label>Sinopsis</label>
+        <textarea formControlName="sinopsis" rows="3" placeholder="Descripción de la película..."></textarea>
+    </div>
+
+    <div class="grid-3">
+      <div class="campo">
+        <label>Duración (min)</label>
+        <input type="number" formControlName="duracion">
+      </div>
+      <div class="campo">
+        <label>Fecha de Estreno</label>
+        <input type="date" formControlName="fecha_estreno">
+      </div>
+      <div class="campo">
+        <label>Restricción de Edad (+edad o vacío)</label>
+        <input type="number" formControlName="restriccion_edad" placeholder="Ej: 16 (Vacío = ATP)">
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="campo">
+        <label>Precios Base ($)</label>
+        <input type="number" formControlName="precio_base">
+      </div>
+      <div class="campo">
+        <label>Precio Preventa ($)</label>
+        <input type="number" formControlName="precio_preventa">
+      </div>
+    </div>
+
+    <div class="campo">
+      <label>Géneros (separados por coma)</label>
+      <input type="text" formControlName="generos" placeholder="Acción, Ciencia Ficción, Thriller">
+    </div>
+
+    <div class="grid-2">
+      <div class="campo">
+        <label>Formatos (separados por coma)</label>
+        <input type="text" formControlName="formatos" placeholder="2D, 3D, XD">
+      </div>
+      <div class="campo">
+        <label>Idiomas (separados por coma)</label>
+        <input type="text" formControlName="idiomas" placeholder="Español, Subtitulado">
+      </div>
+    </div>
+
+    <button type="submit" [disabled]="cargando()">
+      {{ cargando() ? 'Guardando...' : 'Publicar Película' }}
+    </button>
+  </form>
+
+  <!-- Listado Rápido de Control -->
+  <div class="listado-actual">
+    <h3>Películas en Base de Datos ({{ peliculas().length }})</h3>
+    <ul>
+      <li *ngFor="let p of peliculas()">
+        <span><strong>{{ p.nombre }}</strong> ({{ p.duracion }} min)</span>
+        <span class="tags">Formatos: {{ p.formatos?.join(', ') }}</span>
+      </li>
+    </ul>
+  </div>
+</div>

@@ -3,7 +3,9 @@
   "short_name": "app-cine",
   "display": "standalone",
   "scope": "./",
-  "start_url": "./",
+  "start_url": "./",  
+  "theme_color": "#000000",
+  "background_color": "#000000",
   "icons": [
     {
       "src": "icons/icon-72x72.png",

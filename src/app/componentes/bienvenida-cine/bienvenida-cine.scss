@@ -1,0 +1,100 @@
+/* Contenedor principal que centra la tarjeta y le da el fondo oscuro */
+.contenedor-bienvenida-cine {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: radial-gradient(circle at center, #1e1e1e 0%, #000000 100%);
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+/* Tarjeta de contenido (efecto cristal oscuro) */
+.tarjeta-cine {
+  background: rgba(20, 20, 20, 0.85);
+  backdrop-filter: blur(10px);
+  padding: 50px 40px;
+  border-radius: 12px;
+  text-align: center;
+  max-width: 420px;
+  width: 90%;
+  border: 1px solid #333333;
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.8), 
+              0 0 20px rgba(229, 9, 20, 0.15); 
+}
+
+/* Textos e icono */
+.icono-cine {
+  font-size: 88px;
+  margin-bottom: 10px;
+}
+
+.titulo-cine {
+  color: #ffffff;
+  font-size: 32px;
+  font-weight: 700;
+  margin: 0 0 15px 0;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.subtitulo-cine {
+  color: #a3a3a3;
+  font-size: 16px;
+  line-height: 1.6;
+  margin-bottom: 35px;
+}
+
+/* Contenedor y estilos base de botones */
+.grupo-botones {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.boton-cine {
+  width: 100%;
+  padding: 14px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+
+/* Botón Iniciar Sesión (Rojo tipo Netflix) */
+.boton-iniciar-sesion {
+  background-color: #ff4081;
+  color: #ffffff;
+  border: none;
+}
+
+.boton-iniciar-sesion:hover {
+  background-color: #f50057;
+  box-shadow: 0 0 15px rgba(229, 9, 20, 0.6);
+  transform: translateY(-2px);
+}
+
+/* Botón Registrarse (Borde gris, fondo transparente) */
+.boton-registrarse {
+  background-color: transparent;
+  color: #ffffff;
+  border: 2px solid #666666;
+}
+
+.boton-registrarse:hover {
+  border-color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
+}
+
+/* Ajustes para pantallas de teléfonos pequeños */
+@media (max-width: 480px) {
+  .tarjeta-cine {
+    padding: 40px 20px;
+  }
+  .titulo-cine {
+    font-size: 28px;
+  }
+}

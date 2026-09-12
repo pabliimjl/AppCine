@@ -1,0 +1,127 @@
+<div class="candy-contenedor">
+  <div class="header">
+  <button id="boton-atras" routerLink="/admin">
+    &#8592; Atrás 
+  </button>
+  <h2>Gestión del Candy Bar</h2></div>
+
+  <p class="alerta error" *ngIf="mensajeError()">{{ mensajeError() }}</p>
+  <p class="alerta exito" *ngIf="mensajeExito()">{{ mensajeExito() }}</p>
+
+  <div class="tabs-navegacion">
+    <button [class.activo]="pestanaActiva() === 'categorias'" (click)="cambiarPestana('categorias')">1. Categorías</button>
+    <button [class.activo]="pestanaActiva() === 'productos'" (click)="cambiarPestana('productos')">2. Productos</button>
+    <button [class.activo]="pestanaActiva() === 'combos'" (click)="cambiarPestana('combos')">3. Combos Especiales</button>
+  </div>
+
+  <!-- SECCIÓN 1: CATEGORÍAS -->
+  <div class="seccion-tab" *ngIf="pestanaActiva() === 'categorias'">
+    <h3>Administrar Categorías</h3>
+    <form [formGroup]="categoriaForm" (ngSubmit)="guardarCategoria()" class="form-panel">
+      <input type="text" formControlName="nombre" placeholder="Nombre de la Categoría">
+      <button type="submit">Guardar Categoría</button>
+    </form>
+    
+    <div class="lista-chips">
+      <span *ngFor="let cat of categorias()" class="chip">{{ cat.nombre }}</span>
+    </div>
+  </div>
+
+  <!-- SECCIÓN 2: PRODUCTOS -->
+  <div class="seccion-tab" *ngIf="pestanaActiva() === 'productos'">
+    <h3>{{ productoEditandoId() ? 'Editar Producto' : 'Nuevo Producto Individual' }}</h3>
+    <form [formGroup]="productoForm" (ngSubmit)="guardarProducto()" class="form-panel">
+      <input type="text" formControlName="nombre" placeholder="Nombre del Producto">
+      <input type="number" formControlName="precio" placeholder="Precio ($)">
+      <input type="text" formControlName="imagen" placeholder="URL de la imagen">
+      <select formControlName="categoria_id">
+        <option value="" disabled>Seleccione Categoría</option>
+        <option *ngFor="let cat of categorias()" [value]="cat.id">{{ cat.nombre }}</option>
+      </select>
+      <input type="number" formControlName="stock" placeholder="Stock disponible">
+      
+      <div class="botones-form">
+        <button type="submit">{{ productoEditandoId() ? 'Actualizar Producto' : 'Guardar Producto' }}</button>
+        <button type="button" class="btn-cancelar" *ngIf="productoEditandoId()" (click)="cancelarEdicion()">Cancelar</button>
+      </div>
+    </form>
+
+    <div class="grid-items">
+      <div *ngFor="let prod of productos()" class="item-card">
+        <img [src]="prod.imagen" [alt]="prod.nombre" onerror="this.src='https://via.placeholder.com/150'">
+        <div class="info">
+          <h4>{{ prod.nombre }}</h4>
+          <p>${{ prod.precio }} | <small>{{ prod.candy_categorias?.nombre }}</small></p>
+          <div class="acciones-card">
+            <button class="btn-editar" (click)="editarProducto(prod)">Editar</button>
+            <button class="btn-eliminar" (click)="eliminarProducto(prod.id)">Eliminar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECCIÓN 3: COMBOS -->
+  <div class="seccion-tab" *ngIf="pestanaActiva() === 'combos'">
+    <h3>{{ comboEditandoId() ? 'Editar Combo Especial' : 'Crear y Ver Combos' }}</h3>
+    
+    <form [formGroup]="comboForm" (ngSubmit)="guardarCombo()" class="form-panel">
+      <input type="text" formControlName="nombre" placeholder="Nombre del Combo">
+      <textarea formControlName="descripcion" rows="2" placeholder="Descripción..."></textarea>
+      <input type="number" formControlName="precio_combo" placeholder="Precio Final del Combo ($)">
+      <input type="text" formControlName="imagen" placeholder="URL de la imagen del combo">
+
+      <div class="armador-combo">
+        <label>Productos incluidos en el combo:</label>
+        <div class="fila-seleccion">
+          <select formControlName="producto_temporal">
+            <option value="" disabled>Selecciona un producto</option>
+            <option *ngFor="let prod of productos()" [value]="prod.id">{{ prod.nombre }} (${{ prod.precio }})</option>
+          </select>
+          <input type="number" formControlName="cantidad_temporal" min="1" placeholder="Cant" style="width: 70px;">
+          <button type="button" class="btn-add" (click)="agregarProductoACombo()">Agregar</button>
+        </div>
+
+        <div class="productos-agregados-preview">
+          <p *ngIf="productosEnCombo().length === 0" class="vacio">Añade productos al combo arriba.</p>
+          <div *ngFor="let item of productosEnCombo(); let i = index" class="chip-combo">
+            <span>{{ item.cantidad }}x {{ item.nombre }}</span>
+            <button type="button" (click)="removerProductoDeCombo(i)">×</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="botones-form">
+        <button type="submit" [disabled]="cargando()">{{ comboEditandoId() ? 'Actualizar Combo' : 'Guardar Combo' }}</button>
+        <button type="button" class="btn-cancelar" *ngIf="comboEditandoId()" (click)="cancelarEdicion()">Cancelar</button>
+      </div>
+    </form>
+
+    <!-- LISTADO DE COMBOS EXISTENTES -->
+    <div class="listado-combos-existentes">
+      <h4>Combos Registrados ({{ combos().length }})</h4>
+      <div class="grid-items">
+        <div *ngFor="let combo of combos()" class="item-card">
+          <img [src]="combo.imagen" [alt]="combo.nombre" onerror="this.src='https://via.placeholder.com/150'">
+          <div class="info">
+            <h4>{{ combo.nombre }}</h4>
+            <p class="precio-combo">${{ combo.precio_combo }}</p>
+            <p class="desc">{{ combo.descripcion }}</p>
+            
+            <div class="sub-items">
+              <small *ngFor="let item of combo.candy_combo_items">
+                • {{ item.cantidad }}x {{ item.candy_productos?.nombre }}
+              </small>
+            </div>
+
+            <div class="acciones-card">
+              <button class="btn-editar" (click)="editarCombo(combo)">Editar</button>
+              <button class="btn-eliminar" (click)="eliminarCombo(combo.id)">Eliminar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

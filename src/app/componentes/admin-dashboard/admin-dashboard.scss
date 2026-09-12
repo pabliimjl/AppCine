@@ -1,0 +1,110 @@
+.dashboard-contenedor {
+  width: 100%;
+  max-width: 900px;
+  margin: 40px auto;
+  background-color: #1c1c1e;
+  border-radius: 16px;
+  padding: 36px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  color: #ffffff;
+
+  h2 {
+    margin: 0 0 8px 0;
+    font-size: 2rem;
+    color: #ffffff;
+    text-align: center;
+  }
+
+  .subtitulo {
+    text-align: center;
+    color: #aaaaaa;
+    margin-bottom: 30px;
+    font-size: 0.95rem;
+  }
+
+  .metricas-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 36px;
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+    }
+
+    .metrica-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 20px;
+      border-radius: 12px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+
+      .numero {
+        font-size: 2.2rem;
+        font-weight: bold;
+        color: #ff4081;
+      }
+
+      .etiqueta {
+        font-size: 0.85rem;
+        color: #aaaaaa;
+      }
+    }
+  }
+
+  .acciones-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+    }
+
+    .accion-card {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 24px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      text-decoration: none;
+      color: white;
+      transition: transform 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+
+      &:hover {
+        transform: translateY(-4px);
+        background: rgba(255, 255, 255, 0.07);
+        border-color: #ff4081;
+
+        .icono {
+          transform: scale(1.1);
+        }
+      }
+
+      .icono {
+        font-size: 2.5rem;
+        transition: transform 0.2s ease;
+      }
+
+      .info {
+        h3 {
+          margin: 0 0 6px 0;
+          font-size: 1.15rem;
+          color: #ffffff;
+        }
+
+        p {
+          margin: 0;
+          font-size: 0.85rem;
+          color: #aaaaaa;
+          line-height: 1.4;
+        }
+      }
+    }
+  }
+}

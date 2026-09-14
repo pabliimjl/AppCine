@@ -18,11 +18,10 @@ export interface Pelicula {
 @Component({
   selector: 'app-tarjeta-pelicula',
   standalone: true,
-  imports: [CommonModule], // Necesario para ngIf, ngFor y los pipes (Date, Currency)
+  imports: [CommonModule], 
   templateUrl: './tarjeta-pelicula.html',
   styleUrls: ['./tarjeta-pelicula.scss']
 })
 export class TarjetaPeliculaComponent {
-  // El ! le dice a TypeScript que confíe en que este dato va a llegar
   @Input() pelicula!: Pelicula; 
 }

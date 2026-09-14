@@ -29,15 +29,14 @@ export class FuncionesAdminComponent implements OnInit {
     hora_inicio: ['18:00', Validators.required],
     fecha_inicio_recurrencia: ['', Validators.required],
     semanas_duracion: [4, [Validators.required, Validators.min(1)]],
-    // Definimos explícitamente todos los días del 0 al 6 para evitar errores de enlace
     dias_semana: this.fb.group({
-      0: [false], // Domingo
-      1: [true],  // Lunes
-      2: [true],  // Martes
-      3: [false], // Miércoles
-      4: [false], // Jueves
-      5: [true],  // Viernes
-      6: [false]  // Sábado
+      0: [false], 
+      1: [true],  
+      2: [true],  
+      3: [false], 
+      4: [false], 
+      5: [true],  
+      6: [false]  
     })
   });
 
@@ -79,7 +78,6 @@ export class FuncionesAdminComponent implements OnInit {
     const duracionMinutos = pelicula.duracion || 120;
     const [horaStr, minStr] = hora_inicio.split(':');
     
-    // Generamos todas las fechas candidatas según los días de la semana tildados
     const fechasACrear: { inicio: Date; fin: Date }[] = [];
     const fechaBase = new Date(fecha_inicio_recurrencia + 'T00:00:00');
     
@@ -88,16 +86,14 @@ export class FuncionesAdminComponent implements OnInit {
       const fechaActual = new Date(fechaBase);
       fechaActual.setDate(fechaBase.getDate() + i);
       
-      const diaSemana = fechaActual.getDay(); // 0 al 6
+      const diaSemana = fechaActual.getDay(); 
 
-      // Si el día de la semana está seleccionado en el formulario
       if (dias_semana[diaSemana]) {
         const inicio = new Date(fechaActual);
         inicio.setHours(Number(horaStr), Number(minStr), 0, 0);
 
-        // Si la fecha calculada es anterior al día de hoy/inicio, la saltamos
         if (inicio.getTime() >= new Date().getTime()) {
-          const fin = new Date(inicio.getTime() + (duracionMinutos + 30) * 60000); // +30 min intervalo
+          const fin = new Date(inicio.getTime() + (duracionMinutos + 30) * 60000);
           fechasACrear.push({ inicio, fin });
         }
       }
@@ -113,7 +109,6 @@ export class FuncionesAdminComponent implements OnInit {
     let funcionesExitosas = 0;
     let conflictos = 0;
 
-    // Evaluamos e insertamos una por una respetando la disponibilidad de salas en tiempo real
     for (const cita of fechasACrear) {
       const salaAsignada = await this.encontrarSalaLibre(cita.inicio, cita.fin);
 
@@ -128,7 +123,7 @@ export class FuncionesAdminComponent implements OnInit {
         if (!error) funcionesExitosas++;
         else conflictos++;
       } else {
-        conflictos++; // No hubo sala libre en ese horario exacto
+        conflictos++; 
       }
     }
 
@@ -137,7 +132,6 @@ export class FuncionesAdminComponent implements OnInit {
     await this.cargarDatos();
   }
 
-  // Algoritmo infalible de asignación de salas sin cruces
   async encontrarSalaLibre(nuevoInicio: Date, nuevoFin: Date) {
     const supabase = (this.supabaseService as any).supabase;
     const todasSalas = this.salas();
@@ -159,7 +153,6 @@ export class FuncionesAdminComponent implements OnInit {
           const tInicioExistente = new Date(f.fecha_hora_inicio).getTime();
           const tFinExistente = new Date(f.fecha_hora_fin).getTime();
 
-          // Cruce estricto de intervalos
           if (tNuevoInicio < tFinExistente && tNuevoFin > tInicioExistente) {
             haySuperposicion = true;
             break;
@@ -168,11 +161,11 @@ export class FuncionesAdminComponent implements OnInit {
       }
 
       if (!haySuperposicion) {
-        return sala; // Sala libre encontrada para esta fecha y hora
+        return sala; 
       }
     }
 
-    return null; // Todas las salas ocupadas en este horario
+    return null; 
   }
 
   async eliminarFuncion(id: string) {
@@ -185,7 +178,7 @@ export class FuncionesAdminComponent implements OnInit {
       this.mensajeError.set('Error al eliminar la función: ' + error.message);
     } else {
       this.mensajeExito.set('¡Función eliminada con éxito!');
-      await this.cargarDatos(); // Refrescamos el listado
+      await this.cargarDatos(); 
     }
   }
   

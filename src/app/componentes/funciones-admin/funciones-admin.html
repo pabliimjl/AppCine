@@ -3,10 +3,8 @@
   <button id="boton-atras" routerLink="/admin">
     &#8592; Atrás 
   </button>
-<!-- Resultado: ← Atrás -->
 
-<!-- O con un emoji si prefieres: ⬅ Atrás -->
-  <h2>Programación Recurrente de Funciones y Salas</h2></div>
+  <h2>Programación Funciones y Salas</h2></div>
 
   <p class="alerta error" *ngIf="mensajeError()">{{ mensajeError() }}</p>
   <p class="alerta exito" *ngIf="mensajeExito()">{{ mensajeExito() }}</p>
@@ -37,7 +35,6 @@
       <input type="number" formControlName="semanas_duracion" min="1" max="12">
     </div>
 
-    <!-- Selección de Días de la Semana -->
     <div class="campo" formGroupName="dias_semana">
       <label>Días de la semana en que se proyectará:</label>
       <div class="checkboxes-dias">

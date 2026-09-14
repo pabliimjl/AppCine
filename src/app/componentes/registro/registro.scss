@@ -1,8 +1,8 @@
 .contenedor-registro {
   width: 100%;
   max-width: 450px;
-  margin: 40px auto; // Centra el formulario en la pantalla
-  background-color: #1c1c1e; // Mismo fondo oscuro de la tarjeta
+  margin: 40px auto; 
+  background-color: #1c1c1e; 
   border-radius: 16px;
   padding: 32px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
@@ -17,7 +17,6 @@
     color: #ffffff;
   }
 
-  // Alertas dinámicas
   .alerta {
     padding: 12px;
     border-radius: 8px;
@@ -28,13 +27,13 @@
 
     &.error {
       background-color: rgba(255, 64, 129, 0.1);
-      color: #ff4081; // Tu color rosa vibrante
+      color: #ff4081; 
       border: 1px solid rgba(255, 64, 129, 0.3);
     }
 
     &.exito {
       background-color: rgba(0, 230, 118, 0.1);
-      color: #00e676; // Tu color verde ATP
+      color: #00e676; 
       border: 1px solid rgba(0, 230, 118, 0.3);
     }
   }
@@ -46,13 +45,13 @@
 
     label {
       font-size: 0.85rem;
-      color: #aaaaaa; // Mismo tono que la info-técnica de la tarjeta
-      margin-bottom: -10px; // Acerca el label sutilmente al input
+      color: #aaaaaa; 
+      margin-bottom: -10px; 
     }
 
     input {
       width: 100%;
-      background-color: rgba(255, 255, 255, 0.05); // Fondo sutil semi-transparente
+      background-color: rgba(255, 255, 255, 0.05);
       border: 1px solid rgba(255, 255, 255, 0.1);
       color: #ffffff;
       padding: 12px 16px;
@@ -66,13 +65,11 @@
         color: #666666;
       }
 
-      // Efecto brillo al hacer clic (focus) igual al hover de la tarjeta
       &:focus {
         border-color: #ff4081;
         box-shadow: 0 0 0 2px rgba(255, 64, 129, 0.2);
       }
       
-      // Ajuste visual para el ícono del calendario en fondos oscuros
       &[type="date"] {
         color: #aaaaaa;
         &::-webkit-calendar-picker-indicator {
@@ -85,10 +82,9 @@
       }
     }
 
-    // Botón de acción principal
     button {
       margin-top: 16px;
-      background-color: #ff4081; // Mismo color del btn-comprar
+      background-color: #ff4081; 
       color: white;
       border: none;
       padding: 14px;
@@ -103,10 +99,9 @@
       }
 
       &:active:not(:disabled) {
-        transform: scale(0.98); // Pequeño efecto de hundimiento al clickear
+        transform: scale(0.98); 
       }
 
-      // Estado cuando el botón está procesando el registro
       &:disabled {
         background-color: #555555;
         color: #aaaaaa;

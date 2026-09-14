@@ -1,11 +1,10 @@
 .contenedor-login {
   width: 100%;
   max-width: 400px;
-  box-sizing: border-box; /* Previene desbordamientos en pantallas pequeñas */
+  box-sizing: border-box; 
   
-  /* 1. Adaptación móvil y Safe Areas */
   margin: 20px auto; 
-  margin-top: max(20px, env(safe-area-inset-top)); /* Respeta el notch del dispositivo */
+  margin-top: max(20px, env(safe-area-inset-top)); 
   padding: 24px;
   
   background-color: #1c1c1e;
@@ -15,7 +14,6 @@
   display: flex;
   flex-direction: column;
 
-  /* Recupera tu estilo original en tablets/escritorio */
   @media (min-width: 480px) {
     margin: 60px auto;
     padding: 32px;
@@ -53,13 +51,11 @@
       padding: 14px 16px;
       border-radius: 8px;
       
-      /* 2. Fix de iOS Safari: Debe ser de al menos 16px para evitar el auto-zoom indeseado */
       font-size: 16px; 
       
       outline: none;
       box-sizing: border-box;
       
-      /* 3. Normalización nativa */
       -webkit-appearance: none;
       appearance: none;
 
@@ -79,7 +75,6 @@
       color: white;
       border: none;
       
-      /* 4. Área táctil recomendada para móviles (mínimo 44px/48px) */
       min-height: 48px;
       padding: 14px;
       
@@ -89,18 +84,16 @@
       cursor: pointer;
       transition: background-color 0.2s ease, transform 0.1s ease;
       
-      /* 5. Comportamiento táctil de app nativa */
       -webkit-appearance: none;
       appearance: none;
-      touch-action: manipulation; /* Evita el retraso de 300ms al tocar (doble tap zoom) */
-      -webkit-tap-highlight-color: transparent; /* Quita el destello de selección azul en Android/iOS */
-      user-select: none; /* Evita que el usuario seleccione el texto del botón al mantenerlo presionado */
+      touch-action: manipulation; 
+      -webkit-tap-highlight-color: transparent; 
+      user-select: none; 
 
       &:hover:not(:disabled) {
         background-color: #f50057;
       }
 
-      /* Efecto de hundimiento rápido para dar feedback de toque en pantallas táctiles */
       &:active:not(:disabled) {
         transform: scale(0.97);
       }
@@ -118,8 +111,7 @@
     text-align: center;
     font-size: 0.9rem;
     color: #aaaaaa;
-    
-    /* 6. Respeta la barra de navegación gestual de iOS/Android en el borde inferior */
+
     padding-bottom: env(safe-area-inset-bottom);
 
     a {
@@ -127,7 +119,6 @@
       text-decoration: none;
       font-weight: bold;
       
-      /* Expande ligeramente el área táctil del enlace */
       padding: 8px;
       display: inline-block;
       -webkit-tap-highlight-color: transparent;

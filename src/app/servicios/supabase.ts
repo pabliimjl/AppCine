@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { environment } from '../../environments/environment'; // Ruta hacia tu environment
+import { environment } from '../../environments/environment'; 
 
 @Injectable({
-  providedIn: 'root' // ¡Esto es clave!
+  providedIn: 'root' 
 })
 export class SupabaseService {
   private supabase: SupabaseClient;
@@ -34,12 +34,10 @@ export class SupabaseService {
     }
   }
 
-  // 1. Iniciar Sesión
   async login(email: string, password: string) {
     return await this.supabase.auth.signInWithPassword({ email, password });
   }
 
-  // 2. Registrar usuario e insertar datos del TP
   async registrarUsuario(usuarioData: any, password: string) {
     const { data: authData, error: authError } = await this.supabase.auth.signUp({
       email: usuarioData.email,
@@ -48,7 +46,6 @@ export class SupabaseService {
 
     if (authError) return { error: authError };
 
-    // Si se creó en auth, guardamos los datos extra en la tabla pública
     if (authData.user) {
       const { error: dbError } = await this.supabase.from('perfiles').insert({
         id: authData.user.id,
@@ -68,12 +65,10 @@ export class SupabaseService {
   }
 
   async obtenerPerfilUsuario() {
-    // Obtenemos el usuario autenticado actual
     const { data: { user } } = await this.supabase.auth.getUser();
     
     if (!user) return null;
 
-    // Consultamos su rol en la tabla perfiles
     const { data, error } = await this.supabase
       .from('perfiles')
       .select('*')
@@ -85,6 +80,6 @@ export class SupabaseService {
       return null;
     }
 
-    return data; // Aquí vendrá el campo { ..., rol: 'admin' }
+    return data; 
   }
 }

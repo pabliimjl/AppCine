@@ -1,4 +1,3 @@
-/* Contenedor principal que centra la tarjeta y le da el fondo oscuro */
 .contenedor-bienvenida-cine {
   display: flex;
   justify-content: center;
@@ -8,7 +7,6 @@
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
-/* Tarjeta de contenido (efecto cristal oscuro) */
 .tarjeta-cine {
   background: rgba(20, 20, 20, 0.85);
   backdrop-filter: blur(10px);
@@ -22,7 +20,6 @@
               0 0 20px rgba(229, 9, 20, 0.15); 
 }
 
-/* Textos e icono */
 .icono-cine {
   font-size: 88px;
   margin-bottom: 10px;
@@ -44,7 +41,6 @@
   margin-bottom: 35px;
 }
 
-/* Contenedor y estilos base de botones */
 .grupo-botones {
   display: flex;
   flex-direction: column;
@@ -63,7 +59,6 @@
   letter-spacing: 1.5px;
 }
 
-/* Botón Iniciar Sesión (Rojo tipo Netflix) */
 .boton-iniciar-sesion {
   background-color: #ff4081;
   color: #ffffff;
@@ -76,7 +71,6 @@
   transform: translateY(-2px);
 }
 
-/* Botón Registrarse (Borde gris, fondo transparente) */
 .boton-registrarse {
   background-color: transparent;
   color: #ffffff;
@@ -89,7 +83,6 @@
   transform: translateY(-2px);
 }
 
-/* Ajustes para pantallas de teléfonos pequeños */
 @media (max-width: 480px) {
   .tarjeta-cine {
     padding: 40px 20px;

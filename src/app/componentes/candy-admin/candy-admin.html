@@ -14,7 +14,6 @@
     <button [class.activo]="pestanaActiva() === 'combos'" (click)="cambiarPestana('combos')">3. Combos Especiales</button>
   </div>
 
-  <!-- SECCIÓN 1: CATEGORÍAS -->
   <div class="seccion-tab" *ngIf="pestanaActiva() === 'categorias'">
     <h3>Administrar Categorías</h3>
     <form [formGroup]="categoriaForm" (ngSubmit)="guardarCategoria()" class="form-panel">
@@ -27,7 +26,6 @@
     </div>
   </div>
 
-  <!-- SECCIÓN 2: PRODUCTOS -->
   <div class="seccion-tab" *ngIf="pestanaActiva() === 'productos'">
     <h3>{{ productoEditandoId() ? 'Editar Producto' : 'Nuevo Producto Individual' }}</h3>
     <form [formGroup]="productoForm" (ngSubmit)="guardarProducto()" class="form-panel">
@@ -48,7 +46,7 @@
 
     <div class="grid-items">
       <div *ngFor="let prod of productos()" class="item-card">
-        <img [src]="prod.imagen" [alt]="prod.nombre" onerror="this.src='https://via.placeholder.com/150'">
+        <img [src]="prod.imagen" [alt]="prod.nombre">
         <div class="info">
           <h4>{{ prod.nombre }}</h4>
           <p>${{ prod.precio }} | <small>{{ prod.candy_categorias?.nombre }}</small></p>
@@ -61,7 +59,6 @@
     </div>
   </div>
 
-  <!-- SECCIÓN 3: COMBOS -->
   <div class="seccion-tab" *ngIf="pestanaActiva() === 'combos'">
     <h3>{{ comboEditandoId() ? 'Editar Combo Especial' : 'Crear y Ver Combos' }}</h3>
     
@@ -97,12 +94,11 @@
       </div>
     </form>
 
-    <!-- LISTADO DE COMBOS EXISTENTES -->
     <div class="listado-combos-existentes">
       <h4>Combos Registrados ({{ combos().length }})</h4>
       <div class="grid-items">
         <div *ngFor="let combo of combos()" class="item-card">
-          <img [src]="combo.imagen" [alt]="combo.nombre" onerror="this.src='https://via.placeholder.com/150'">
+          <img [src]="combo.imagen" [alt]="combo.nombre">
           <div class="info">
             <h4>{{ combo.nombre }}</h4>
             <p class="precio-combo">${{ combo.precio_combo }}</p>

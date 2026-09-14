@@ -4,10 +4,9 @@ import { RouterLink } from '@angular/router';
 @Component({
   selector: 'app-bienvenida-cine',
   standalone: true,
-  imports: [RouterLink], // Importamos RouterLink para habilitar la navegación
+  imports: [RouterLink], 
   templateUrl: './bienvenida-cine.html',
-  styleUrl: './bienvenida-cine.scss' // Nota: styleUrl en singular (nomenclatura moderna)
+  styleUrl: './bienvenida-cine.scss' 
 })
 export class BienvenidaCine {
-  // El componente queda limpio. La navegación se maneja en el template.
 }

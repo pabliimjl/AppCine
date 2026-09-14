@@ -5,11 +5,9 @@
   </button>
   <h2>Gestión de Peliculas</h2></div>  
 
-  <!-- Mensajes de Estado -->
   <p class="alerta error" *ngIf="mensajeError()">{{ mensajeError() }}</p>
   <p class="alerta exito" *ngIf="mensajeExito()">{{ mensajeExito() }}</p>
 
-  <!-- Formulario de Alta de Películas -->
   <form [formGroup]="peliculaForm" (ngSubmit)="guardarPelicula()" class="admin-form">
     <h3>Registrar Nueva Película</h3>
 
@@ -63,7 +61,7 @@
     <div class="grid-2">
       <div class="campo">
         <label>Formatos (separados por coma)</label>
-        <input type="text" formControlName="formatos" placeholder="2D, 3D, XD">
+        <input type="text" formControlName="formatos" placeholder="2D, 3D, 4D, 5D">
       </div>
       <div class="campo">
         <label>Idiomas (separados por coma)</label>
@@ -76,7 +74,6 @@
     </button>
   </form>
 
-  <!-- Listado Rápido de Control -->
   <div class="listado-actual">
     <h3>Películas en Base de Datos ({{ peliculas().length }})</h3>
     <ul>

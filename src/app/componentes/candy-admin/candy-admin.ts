@@ -99,7 +99,6 @@ export class CandyAdminComponent implements OnInit {
     if (comboRes.data) this.combos.set(comboRes.data);
   }
 
-  // --- PRODUCTOS ---
   async guardarProducto() {
     if (this.productoForm.invalid) return;
     const supabase = (this.supabaseService as any).supabase;
@@ -151,7 +150,6 @@ export class CandyAdminComponent implements OnInit {
     }
   }
 
-  // --- COMBOS ---
   agregarProductoACombo() {
     const prodId = this.comboForm.get('producto_temporal')?.value;
     const cantidad = Number(this.comboForm.get('cantidad_temporal')?.value || 1);
@@ -185,7 +183,6 @@ export class CandyAdminComponent implements OnInit {
     const { nombre, descripcion, precio_combo, imagen } = this.comboForm.value;
 
     if (this.comboEditandoId()) {
-      // Actualizar combo principal
       const { error: comboError } = await supabase
         .from('candy_combos')
         .update({ nombre, descripcion, precio_combo, imagen })
@@ -197,7 +194,6 @@ export class CandyAdminComponent implements OnInit {
         return;
       }
 
-      // Reemplazar ítems: borramos los anteriores y reinsertamos
       await supabase.from('candy_combo_items').delete().eq('combo_id', this.comboEditandoId());
       
       const itemsRelacion = this.productosEnCombo().map(item => ({
@@ -214,7 +210,6 @@ export class CandyAdminComponent implements OnInit {
       await this.cargarDatos();
 
     } else {
-      // Crear nuevo combo
       const { data: comboData, error: comboError } = await supabase
         .from('candy_combos')
         .insert([{ nombre, descripcion, precio_combo, imagen }])
@@ -243,7 +238,7 @@ export class CandyAdminComponent implements OnInit {
     }
   }
 
-editarCombo(combo: any) {
+  editarCombo(combo: any) {
     this.comboEditandoId.set(combo.id);
     this.comboForm.patchValue({
       nombre: combo.nombre,
@@ -252,7 +247,6 @@ editarCombo(combo: any) {
       imagen: combo.imagen
     });
 
-    // Mapear los ítems existentes asegurando el producto_id
     const itemsMapeados = combo.candy_combo_items.map((i: any) => ({
       producto_id: i.producto_id, // <--- AHORA SE ASIGNA EL ID CORRECTAMENTE
       cantidad: i.cantidad,

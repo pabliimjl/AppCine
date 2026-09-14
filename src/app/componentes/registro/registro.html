@@ -5,18 +5,15 @@
   <p class="alerta exito" *ngIf="mensajeExito()">{{ mensajeExito() }}</p>
 
   <form [formGroup]="registroForm" (ngSubmit)="registrar()">
-    <!-- Credenciales -->
     <input type="email" formControlName="email" placeholder="Correo electrónico">
     <input type="password" formControlName="password" placeholder="Contraseña (mínimo 6 caracteres)">
     
-    <!-- Datos Personales -->
     <input type="text" formControlName="nombre" placeholder="Nombre">
     <input type="text" formControlName="apellido" placeholder="Apellido">
     
     <label>Fecha de Nacimiento:</label>
     <input type="date" formControlName="fecha_nacimiento">
     
-    <!-- Datos Específicos del TP -->
     <input type="text" formControlName="tipo_sangre" placeholder="Tipo de Sangre (Ej: O+)">
     <input type="text" formControlName="color_ojos" placeholder="Color de Ojos">
     

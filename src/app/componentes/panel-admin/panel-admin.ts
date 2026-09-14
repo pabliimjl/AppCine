@@ -20,7 +20,6 @@ export class AdminPanel implements OnInit {
   mensajeExito = signal<string | null>(null);
   mensajeError = signal<string | null>(null);
 
-  // Formulario completo para la gestión de películas
   peliculaForm: FormGroup = this.fb.group({
     nombre: ['', Validators.required],
     sinopsis: ['', Validators.required],
@@ -29,8 +28,8 @@ export class AdminPanel implements OnInit {
     fecha_estreno: ['', Validators.required],
     precio_base: [1500, [Validators.required, Validators.min(0)]],
     precio_preventa: [1200, [Validators.required, Validators.min(0)]],
-    restriccion_edad: [null], // Ej: 13, 16, 18 o null (ATP)
-    generos: ['Acción, Drama', Validators.required], // Los ingresaremos separados por coma para comodidad
+    restriccion_edad: [null], 
+    generos: ['Acción, Drama', Validators.required], 
     formatos: ['2D, 3D', Validators.required],
     idiomas: ['Español, Subtitulado', Validators.required]
   });
@@ -56,7 +55,6 @@ export class AdminPanel implements OnInit {
 
     const formValues = this.peliculaForm.value;
 
-    // Transformamos los strings separados por comas en arreglos de texto (TEXT[]) para PostgreSQL
     const nuevaPelicula = {
       ...formValues,
       generos: formValues.generos.split(',').map((g: string) => g.trim()),
@@ -74,11 +72,10 @@ export class AdminPanel implements OnInit {
     } else {
       this.mensajeExito.set('¡Película agregada con éxito a la cartelera!');
       this.peliculaForm.reset();
-      await this.cargarPeliculas(); // Refrescamos la lista
+      await this.cargarPeliculas(); 
     }
   }
 
-  // Pequeño helper temporal para acceder al cliente desde el componente si no lo tienes expuesto
   get supabase() {
     return (this.supabaseService as any).supabase;
   }

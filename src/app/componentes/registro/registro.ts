@@ -20,7 +20,7 @@ export class RegistroComponent {
 
   registroForm: FormGroup = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required, Validators.minLength(6)]],
+    password: ['', [Validators.required, Validators.minLength(6)]], //agregar repetir clave
     nombre: ['', Validators.required],
     apellido: ['', Validators.required],
     fecha_nacimiento: ['', Validators.required],

@@ -8,7 +8,8 @@
   import { adminGuard } from './guards/admin-guard';
   import { BienvenidaCine } from './componentes/bienvenida-cine/bienvenida-cine';
 
-  export const routes: Routes = [
+  export const routes: Routes = [ //agregar lazy loading
+    
     { path: '', 
           component: BienvenidaCine,
           title: 'Bienvenido - App de Cine' 
@@ -23,7 +24,7 @@
         { path: 'peliculas', component: AdminPanel },
         { path: 'funciones', component: FuncionesAdminComponent },
         { path: 'candy', component: CandyAdminComponent }   
-        
+
       ]
     },
     { path: '**', 

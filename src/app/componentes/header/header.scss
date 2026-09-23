@@ -1,0 +1,74 @@
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background-color: #0f1014; /* Mantiene la estética oscura */
+  border-bottom: 1px solid #1a1c23;
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #a3a3a3;
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+
+  .header-right {
+    .btn-login {
+      background-color: #ffffff;
+      color: #0f1014;
+      border: none;
+      padding: 0.5rem 1.25rem;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s, transform 0.1s;
+
+      &:hover {
+        background-color: #e5e5e5;
+        transform: translateY(-1px);
+      }
+      &:active {
+        transform: translateY(1px);
+      }
+    }
+  }
+  .header-right {
+    display: flex;
+    align-items: center;
+
+    .usuario-logueado, .invitado-bloque {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .saludo {
+      color: #e5e5e5;
+      font-weight: 500;
+    }
+
+    .texto-invitado {
+      color: #a3a3a3;
+      font-style: italic;
+      font-size: 0.9rem;
+    }
+
+    .btn-cerrar {
+      background: transparent;
+      color: #e50914;
+      border: 1px solid #e50914;
+      padding: 0.4rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &:hover {
+        background: #e50914;
+        color: white;
+      }
+    }
+  }
+}

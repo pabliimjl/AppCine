@@ -2,6 +2,7 @@
   width: 100%;
   max-width: 900px;
   margin: 40px auto;
+  box-sizing: border-box;
   background-color: #1c1c1e;
   border-radius: 16px;
   padding: 36px;
@@ -24,12 +25,12 @@
 
   .metricas-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 16px;
     margin-bottom: 36px;
 
     @media (max-width: 768px) {
-      grid-template-columns: 1fr;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     .metrica-card {
@@ -65,6 +66,7 @@
     }
 
     .accion-card {
+      min-width: 0;
       background: rgba(255, 255, 255, 0.04);
       border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 12px;
@@ -92,6 +94,8 @@
       }
 
       .info {
+        min-width: 0;
+
         h3 {
           margin: 0 0 6px 0;
           font-size: 1.15rem;
@@ -105,6 +109,28 @@
           line-height: 1.4;
         }
       }
+    }
+  }
+}
+
+@media (max-width: 640px) {
+  .dashboard-contenedor {
+    width: calc(100% - 24px);
+    margin: 12px auto;
+    padding: 24px 16px;
+
+    h2 {
+      font-size: 1.5rem;
+    }
+
+    .metricas-grid,
+    .acciones-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .accion-card {
+      padding: 18px;
+      gap: 14px;
     }
   }
 }

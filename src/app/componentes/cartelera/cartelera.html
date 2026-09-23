@@ -1,0 +1,64 @@
+<section class="cartelera-container">
+  <h2 class="cartelera-titulo">En Cartelera</h2>
+
+  <!-- Barra de días con flechas -->
+  <div class="carrusel-fechas-container">
+    
+    <!-- Flecha Izquierda -->
+    <button class="btn-flecha" (click)="diaAnterior()" [disabled]="indiceActual === 0">
+      &#10094;
+    </button>
+
+    <div class="tabs-dias">
+      <button 
+        class="tab-dia" 
+        *ngFor="let dia of diasVisibles" 
+        [ngClass]="{'activo': diaSeleccionado === dia.fechaFull}"
+        (click)="seleccionarDia(dia.fechaFull)">
+        {{ dia.etiqueta }}
+      </button>
+    </div>
+
+    <!-- Flecha Derecha -->
+    <button class="btn-flecha" (click)="siguienteDia()" [disabled]="indiceActual + 4 >= todosLosDias.length">
+      &#10095;
+    </button>
+
+  </div>
+
+  <!-- Grilla de Películas -->
+  <div class="grid-peliculas" *ngIf="peliculasMostradas.length > 0; else noFunciones">
+    <article class="pelicula-card" *ngFor="let peli of peliculasMostradas">
+      
+      <!-- Póster y Etiqueta de Estreno -->
+      <div class="poster-wrapper">
+        <img [src]="peli.imagen" [alt]="peli.nombre" class="poster-img">
+        <span class="badge-estreno" *ngIf="esEstreno(peli.fecha_estreno)">NUEVO</span>
+      </div>
+      
+      <!-- Información de la Película y Horarios -->
+      <div class="pelicula-info">
+        <h3 class="pelicula-titulo">{{ peli.nombre }}</h3>
+        <p class="pelicula-genero">{{ peli.generos?.join(', ') }}</p>
+        
+        <!-- Lista de Horarios -->
+        <div class="horarios-list">
+          <span class="horario-badge" *ngFor="let horario of peli.horarios">
+            {{ horario | date:'HH:mm' }}
+          </span>
+        </div>
+
+        <button class="btn-reservar">Seleccionar Asientos</button>
+      </div>
+
+    </article>
+  </div>
+
+  <!-- Estado Vacío (Sin funciones) -->
+  <ng-template #noFunciones>
+    <div class="no-funciones">
+      <p>No hay funciones programadas para este día.</p>
+    </div>
+  </ng-template>
+
+</section>

@@ -1,0 +1,199 @@
+.cartelera-container {
+  padding: 2rem;
+  background-color: #0f1014; 
+  min-height: 100vh;
+  color: #ffffff;
+
+  .cartelera-titulo {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    color: #e5e5e5;
+  }
+
+  .grid-peliculas {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 2rem;
+
+    .pelicula-card {
+      background: #1a1c23;
+      border-radius: 12px;
+      overflow: hidden;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      cursor: pointer;
+
+      &:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.5);
+        
+        .poster-wrapper img {
+          transform: scale(1.05);
+        }
+      }
+
+      .poster-wrapper {
+        position: relative;
+        overflow: hidden;
+        aspect-ratio: 2/3;
+
+        .poster-img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          transition: transform 0.4s ease;
+        }
+
+        .badge-estreno {
+          position: absolute;
+          top: 10px;
+          right: 10px;
+          background: #e50914; /* Rojo tipo Netflix */
+          color: white;
+          padding: 4px 8px;
+          font-size: 0.75rem;
+          font-weight: bold;
+          border-radius: 4px;
+          letter-spacing: 1px;
+        }
+      }
+
+      .pelicula-info {
+        padding: 1rem;
+
+        .pelicula-titulo {
+          font-size: 1.1rem;
+          margin: 0 0 0.5rem 0;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .pelicula-genero {
+          font-size: 0.85rem;
+          color: #a3a3a3;
+          margin-bottom: 1rem;
+        }
+
+        .btn-reservar {
+          width: 100%;
+          padding: 0.75rem;
+          background-color: rgba(255, 255, 255, 0.1);
+          color: white;
+          border: none;
+          border-radius: 6px;
+          font-weight: 600;
+          transition: background-color 0.2s;
+
+          &:hover {
+            background-color: #e50914;
+          }
+        }
+      }
+    }
+  }
+  .horarios-list {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.5rem;
+          margin-bottom: 1rem;
+
+          .horario-badge {
+            background-color: #2a2d3a;
+            color: #e5e5e5;
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            border: 1px solid #3f4354;
+            transition: border-color 0.2s, color 0.2s;
+
+            &:hover {
+              border-color: #e50914;
+              color: white;
+            }
+          }
+        }
+
+        /* Agrega esto a tu .cartelera-container */
+
+  /* Reemplaza la sección .tabs-dias anterior por esto: */
+
+  .carrusel-fechas-container {
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Centrar todo el bloque */
+    gap: 1rem;
+    margin-bottom: 2rem;
+
+    .btn-flecha {
+      background-color: transparent;
+      border: 1px solid #3f4354;
+      color: #e5e5e5;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1.2rem;
+      transition: all 0.2s;
+
+      &:hover:not(:disabled) {
+        background-color: rgba(255, 255, 255, 0.1);
+        color: white;
+      }
+
+      &:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+        border-color: #2a2d3a;
+      }
+    }
+
+    .tabs-dias {
+      display: flex;
+      gap: 1rem;
+      /* Opcional: ancho fijo para evitar saltos si los textos tienen diferente largo */
+      width: 100%;
+      max-width: 500px; 
+      justify-content: space-between;
+
+      .tab-dia {
+        flex: 1; /* Para que todas las pestañas ocupen el mismo ancho */
+        text-align: center;
+        background-color: transparent;
+        border: 1px solid #3f4354;
+        color: #a3a3a3;
+        padding: 0.75rem 0.5rem;
+        border-radius: 20px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+
+        &:hover {
+          background-color: rgba(255, 255, 255, 0.05);
+          color: white;
+        }
+
+        &.activo {
+          background-color: #e50914;
+          border-color: #e50914;
+          color: white;
+          box-shadow: 0 4px 10px rgba(229, 9, 20, 0.3);
+        }
+      }
+    }
+  }
+
+  .no-funciones {
+    text-align: center;
+    padding: 3rem;
+    background-color: #1a1c23;
+    border-radius: 12px;
+    color: #a3a3a3;
+    font-size: 1.1rem;
+    grid-column: 1 / -1; /* Ocupa todo el ancho del grid */
+  }
+}

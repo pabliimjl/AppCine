@@ -1,0 +1,25 @@
+<header class="app-header">
+  <div class="header-left">
+  </div>
+
+  <div class="header-right" *ocultarEnRutas="['/login', '/registro']">
+    
+    <!-- Nuevo Control Flow de Angular -->
+    @if (estaLogeado()) {
+      
+      <div class="usuario-logueado">
+        <span class="saludo">¡Bienvenido, {{ nombreUsuario() }}!</span>
+        <button class="btn-cerrar" (click)="cerrarSesion()">Salir</button>
+      </div>
+      
+    } @else {
+      
+      <div class="invitado-bloque">
+        <span class="texto-invitado">Usted está en modo invitado</span>
+        <button class="btn-login" routerLink="/login">Iniciar Sesión</button>
+      </div>
+
+    }
+
+  </div>
+</header>

@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "public": "public/browser",
+    "public": "dist/app-cine/browser",
     "ignore": [
       "firebase.json",
       "**/.*",

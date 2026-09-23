@@ -1,28 +1,15 @@
-import { Component, OnInit, signal } from '@angular/core'; 
-import { CommonModule } from '@angular/common';
-import { SupabaseService } from './servicios/supabase'; 
-import { RouterLink, RouterOutlet } from '@angular/router';
+import { Component } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
+import { Header } from './componentes/header/header'; // Ajusta la ruta
+import { Footer } from './componentes/footer/footer'; // Ajusta la ruta
 
 @Component({
   selector: 'app-root',
-  standalone: true, 
-  imports: [CommonModule, RouterOutlet],
+  standalone: true,
+  imports: [RouterOutlet, Header, Footer],
   templateUrl: './app.html',
-  styleUrls: ['./app.scss'] 
+  styleUrls: ['./app.scss']
 })
-export class App implements OnInit {
-  
-  listaPeliculas = signal<any[]>([]); 
-  cargando = signal<boolean>(true); 
-
-  constructor(private supabaseService: SupabaseService) {}
-
-  async ngOnInit() {
-    const pelis = await this.supabaseService.obtenerPeliculas();
-    
-    this.listaPeliculas.set(pelis);
-    this.cargando.set(false); 
-    
-    console.log('Mis películas con Signals:', this.listaPeliculas());
-  }
+export class App {
+  title = 'app-cine';
 }

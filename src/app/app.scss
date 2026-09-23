@@ -1,6 +1,10 @@
+.app-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* Ocupa al menos el 100% del alto de la ventana */
+}
 
-
-.contenedor-cartelera{
-    background-color: #101012;
-    margin: 0px;
+.main-content {
+  flex: 1; /* Esto empuja el footer hacia abajo */
+  background-color: #0f1014; /* Color de fondo general */
 }

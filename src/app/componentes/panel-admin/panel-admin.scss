@@ -2,6 +2,7 @@
   width: 100%;
   max-width: 800px;
   margin: 30px auto;
+  box-sizing: border-box;
   background-color: #1c1c1e;
   border-radius: 16px;
   padding: 32px;
@@ -67,13 +68,13 @@
 
     .grid-2 {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 16px;
     }
 
     .grid-3 {
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 16px;
     }
 
@@ -88,6 +89,8 @@
       }
 
       input, textarea {
+        box-sizing: border-box;
+        width: 100%;
         background-color: rgba(255, 255, 255, 0.05);
         border: 1px solid rgba(255, 255, 255, 0.1);
         color: #ffffff;
@@ -154,6 +157,39 @@
           color: #ff4081;
           font-size: 0.8rem;
         }
+      }
+    }
+  }
+}
+
+@media (max-width: 640px) {
+  .admin-contenedor {
+    width: calc(100% - 24px);
+    margin: 12px auto;
+    padding: 20px 16px;
+
+    .header {
+      flex-direction: column;
+      gap: 8px;
+      text-align: center;
+    }
+
+    #boton-atras {
+      align-self: stretch;
+    }
+
+    .admin-form {
+      .grid-2,
+      .grid-3 {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .listado-actual {
+      ul li {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 6px;
       }
     }
   }

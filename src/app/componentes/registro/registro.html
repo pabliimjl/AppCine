@@ -7,6 +7,19 @@
   <form [formGroup]="registroForm" (ngSubmit)="registrar()">
     <input type="email" formControlName="email" placeholder="Correo electrónico">
     <input type="password" formControlName="password" placeholder="Contraseña (mínimo 6 caracteres)">
+    <!-- Campo Repetir Contraseña -->
+  <div>
+    
+    <input id="repetir_password" type="password" placeholder="Repetir contraseña" formControlName="repetir_password">
+    
+    <div *ngIf="registroForm.get('repetir_password')?.touched && registroForm.get('repetir_password')?.hasError('passwordsMismatch')" class="error">
+      Las contraseñas no coinciden.
+    </div>
+    
+    <div *ngIf="registroForm.get('repetir_password')?.touched && registroForm.get('repetir_password')?.hasError('required')" class="error">
+      Debes confirmar tu contraseña.
+    </div>
+  </div>
     
     <input type="text" formControlName="nombre" placeholder="Nombre">
     <input type="text" formControlName="apellido" placeholder="Apellido">

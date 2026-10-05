@@ -1,0 +1,209 @@
+/* Contenedor principal */
+.reserva-container {
+  max-width: 700px;
+  margin: 30px auto;
+  padding: 25px;
+  background-color: #121212; /* Fondo oscuro */
+  border-radius: 12px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+  color: #e0e0e0;
+}
+
+/* Cabecera: Información de la película */
+.info-pelicula {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 30px;
+  padding-bottom: 25px;
+  border-bottom: 1px solid #333;
+
+  img {
+    width: 110px;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+    object-fit: cover;
+  }
+
+  h2 {
+    margin: 0 0 10px 0;
+    font-size: 1.8rem;
+    color: #ffffff;
+    line-height: 1.2;
+  }
+
+  p {
+    margin: 6px 0;
+    color: #a0a0a0;
+    font-size: 1rem;
+    
+    strong {
+      color: #e0e0e0;
+    }
+  }
+}
+
+.info-pelicula .badge-preventa {
+  display: inline-block;
+  margin-top: 10px;
+  color: #ffffff;
+  background-color: #c93652;
+  padding: 5px 9px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+/* Sección de selección de entradas */
+.seleccion-entradas {
+  h3 {
+    margin: 0 0 20px 0;
+    color: #ffffff;
+    font-size: 1.3rem;
+  }
+}
+
+.tipo-entrada {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 0;
+  border-bottom: 1px solid #2a2a2a;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  .detalle-tipo {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    span:first-child {
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: #ffffff;
+    }
+
+    .precio {
+      color: #e50914; /* Rojo característico */
+      font-weight: 500;
+      font-size: 0.95rem;
+    }
+  }
+
+  /* Botones de sumar y restar */
+  .controles {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+
+    button {
+      width: 40px;
+      height: 40px;
+      border: none;
+      border-radius: 8px;
+      background-color: #2a2a2a;
+      color: #ffffff;
+      font-size: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background-color: #e50914;
+      }
+
+      &:active {
+        transform: scale(0.95);
+      }
+    }
+
+    span {
+      font-size: 1.2rem;
+      font-weight: 700;
+      min-width: 25px;
+      text-align: center;
+    }
+  }
+}
+
+/* Caja de resumen al final */
+.resumen-compra {
+  margin-top: 30px;
+  padding: 25px;
+  background-color: #1e1e1e;
+  border-radius: 10px;
+  text-align: center;
+  border: 1px solid #333;
+
+  h3 {
+    margin: 0 0 20px 0;
+    font-size: 1.7rem;
+    color: #ffffff;
+  }
+
+  .btn-confirmar {
+    width: 100%;
+    padding: 16px;
+    border: none;
+    border-radius: 8px;
+    background-color: #e50914;
+    color: #ffffff;
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+
+    &:hover:not([disabled]) {
+      background-color: #ff0a16;
+    }
+
+    &[disabled] {
+      background-color: #333;
+      color: #777;
+      cursor: not-allowed;
+    }
+  }
+}
+
+/* Estado de carga */
+.loading {
+  text-align: center;
+  padding: 60px 20px;
+  color: #a0a0a0;
+  font-size: 1.2rem;
+}
+
+/* Diseño adaptativo para celulares */
+@media (max-width: 600px) {
+  .info-pelicula {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+
+    img {
+      width: 140px;
+    }
+  }
+
+  .tipo-entrada {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+
+    .controles {
+      width: 100%;
+      justify-content: space-between;
+      
+      /* Botones un poco más anchos en móvil para tap fácil */
+      button {
+        width: 50px;
+      }
+    }
+  }
+}

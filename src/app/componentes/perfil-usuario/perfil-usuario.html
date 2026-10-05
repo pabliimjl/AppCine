@@ -1,0 +1,239 @@
+<main class="perfil-pagina">
+  <a class="volver-cartelera" routerLink="/">Volver a cartelera</a>
+
+  <section class="perfil-panel">
+    <header class="perfil-cabecera">
+      <div class="avatar-perfil" aria-hidden="true">{{ perfilForm.controls.nombre.value?.charAt(0) || 'U' }}</div>
+      <div>
+        <h1>Mi Perfil</h1>
+        <p>Actualizá tus datos personales</p>
+      </div>
+    </header>
+
+    <nav class="menu-perfil" aria-label="Secciones del perfil">
+      <button type="button" [class.activo]="seccionActiva() === 'datos'" (click)="seleccionarSeccion('datos')">Cambiar datos</button>
+      <button type="button" [class.activo]="seccionActiva() === 'creditos'" (click)="seleccionarSeccion('creditos')">Mis créditos</button>
+      <button type="button" [class.activo]="seccionActiva() === 'puntos'" (click)="seleccionarSeccion('puntos')">Mis puntos</button>
+      <button type="button" [class.activo]="seccionActiva() === 'compras'" (click)="seleccionarSeccion('compras')">Mis compras</button>
+      <button type="button" [class.activo]="seccionActiva() === 'peliculas'" (click)="seleccionarSeccion('peliculas')">Mis películas</button>
+    </nav>
+
+    <p class="estado-formulario error" role="alert" *ngIf="seccionActiva() === 'datos' && mensajeError()">{{ mensajeError() }}</p>
+    <p class="estado-formulario exito" role="status" *ngIf="seccionActiva() === 'datos' && mensajeExito()">{{ mensajeExito() }}</p>
+    <p class="estado-formulario exito" role="status" *ngIf="mensajeCuenta()">{{ mensajeCuenta() }}</p>
+    <div class="cargando-perfil" *ngIf="cargando()">Cargando perfil...</div>
+
+    <form *ngIf="!cargando() && !mensajeError() && seccionActiva() === 'datos'" [formGroup]="perfilForm" (ngSubmit)="guardarPerfil()">
+      <label class="campo-perfil solo-lectura">
+        <span>Correo electrónico</span>
+        <input type="email" [value]="email()" readonly>
+      </label>
+
+      <div class="campos-dobles">
+        <label class="campo-perfil">
+          <span>Nombre</span>
+          <input type="text" formControlName="nombre" autocomplete="given-name">
+          <small *ngIf="perfilForm.controls.nombre.touched && perfilForm.controls.nombre.invalid">Ingresá un nombre válido.</small>
+        </label>
+        <label class="campo-perfil">
+          <span>Apellido</span>
+          <input type="text" formControlName="apellido" autocomplete="family-name">
+          <small *ngIf="perfilForm.controls.apellido.touched && perfilForm.controls.apellido.invalid">Ingresá un apellido válido.</small>
+        </label>
+      </div>
+
+      <label class="campo-perfil">
+        <span>Fecha de nacimiento</span>
+        <input type="date" formControlName="fecha_nacimiento" autocomplete="bday">
+        <small *ngIf="perfilForm.controls.fecha_nacimiento.touched && perfilForm.controls.fecha_nacimiento.invalid">Ingresá tu fecha de nacimiento.</small>
+      </label>
+
+      <div class="campos-dobles">
+        <label class="campo-perfil">
+          <span>Tipo de sangre</span>
+          <input type="text" formControlName="tipo_sangre" autocomplete="off">
+        </label>
+        <label class="campo-perfil">
+          <span>Color de ojos</span>
+          <input type="text" formControlName="color_ojos" autocomplete="off">
+        </label>
+      </div>
+
+      <label class="campo-perfil solo-lectura" *ngIf="diasVacaciones() !== null">
+        <span>Días de vacaciones al año</span>
+        <input type="number" [value]="diasVacaciones()" readonly>
+      </label>
+
+      <button class="guardar-perfil" type="submit" [disabled]="guardando()">
+        {{ guardando() ? 'Guardando...' : 'Guardar cambios' }}
+      </button>
+    </form>
+
+    <section class="seccion-cuenta" *ngIf="!cargando() && seccionActiva() === 'creditos'">
+      <div class="saldo-creditos">
+        <span>Saldo disponible</span>
+        <strong>{{ creditos() | number:'1.0-2' }} créditos</strong>
+        <small>1 peso equivale a 1 crédito.</small>
+      </div>
+
+      <h2>Movimientos</h2>
+      <p class="vacio-cuenta" *ngIf="movimientosCreditos().length === 0">Todavía no tenés movimientos de créditos.</p>
+      <div class="lista-movimientos" *ngIf="movimientosCreditos().length > 0">
+        <div class="movimiento-credito" *ngFor="let movimiento of movimientosCreditos()">
+          <div>
+            <strong>{{ movimiento.tipo === 'devolucion' ? 'Devolución por compra cancelada' : 'Pago de compra con créditos' }}</strong>
+            <small>{{ movimiento.creado_en | date:'dd/MM/yyyy HH:mm' }}</small>
+          </div>
+          <strong [class.debito-creditos]="movimiento.tipo === 'compra'">
+            {{ movimiento.tipo === 'devolucion' ? '+' : '-' }}{{ movimiento.importe | number:'1.0-2' }} créditos
+          </strong>
+        </div>
+      </div>
+    </section>
+
+    <section class="seccion-cuenta" *ngIf="!cargando() && seccionActiva() === 'puntos'">
+      <div class="saldo-puntos">
+        <span>Saldo disponible</span>
+        <strong>{{ puntos() | number:'1.0-2' }} puntos</strong>
+        <small>Se acredita 1 punto por cada peso pagado con dinero.</small>
+      </div>
+
+      <section class="canje-puntos">
+        <h2>Canjear puntos</h2>
+        <p>Valor actual: {{ valorPuntoPesos() | currency:'ARS':'symbol':'1.2-4' }} por punto. Los créditos se pueden usar para entradas y Candy.</p>
+        <label>
+          Puntos a canjear
+          <input
+            type="number"
+            min="1"
+            step="1"
+            [max]="puntos()"
+            [value]="puntosACanjear() || ''"
+            (input)="actualizarPuntosACanjear($event)">
+        </label>
+        <p class="estimado-canje">Recibirás {{ creditosEstimadosPorCanje() | currency:'ARS':'symbol':'1.2-2' }} en créditos.</p>
+        <button type="button" [disabled]="canjeandoPuntos() || puntosACanjear() <= 0 || puntosACanjear() > puntos()" (click)="canjearPuntos()">
+          {{ canjeandoPuntos() ? 'Canjeando...' : 'Canjear por créditos' }}
+        </button>
+      </section>
+
+      <h2>Historial de puntos</h2>
+      <p class="vacio-cuenta" *ngIf="movimientosPuntos().length === 0">Todavía no tenés movimientos de puntos.</p>
+      <div class="lista-movimientos" *ngIf="movimientosPuntos().length > 0">
+        <div class="movimiento-credito movimiento-puntos" *ngFor="let movimiento of movimientosPuntos()">
+          <div>
+            <strong>{{ movimiento.tipo === 'acumulacion' ? 'Puntos por compra' : movimiento.tipo === 'reversion' ? 'Puntos revertidos por cancelación' : 'Canje de puntos' }}</strong>
+            <small>{{ movimiento.creado_en | date:'dd/MM/yyyy HH:mm' }}</small>
+            <small *ngIf="movimiento.tipo === 'canje'">Créditos recibidos: {{ movimiento.creditos_generados | number:'1.0-2' }}</small>
+          </div>
+          <strong [class.debito-creditos]="movimiento.tipo !== 'acumulacion'">
+            {{ movimiento.tipo === 'acumulacion' ? '+' : '-' }}{{ movimiento.puntos | number:'1.0-2' }} puntos
+          </strong>
+        </div>
+      </div>
+    </section>
+
+    <section class="seccion-cuenta" *ngIf="!cargando() && seccionActiva() === 'compras'">
+      <h2>Mis compras</h2>
+      <p class="vacio-cuenta" *ngIf="compras().length === 0">Todavía no hay compras asociadas a tu cuenta.</p>
+
+      <article class="compra-usuario" *ngFor="let compra of compras()">
+        <img *ngIf="compra.pelicula?.imagen" [src]="compra.pelicula.imagen" [alt]="compra.pelicula.nombre">
+        <div class="compra-detalle">
+          <div class="compra-titulo-fila">
+            <h3>{{ compra.pelicula?.nombre || 'Compra de cine' }}</h3>
+            <span class="estado-compra" [class.cancelada]="compra.cancelada_en">
+              {{ compra.cancelada_en ? 'Cancelada' : compra.entradas_retiradas || compra.candy_retirado ? 'Utilizada' : 'Activa' }}
+            </span>
+          </div>
+          <p>{{ compra.fecha_hora_inicio | date:'dd/MM/yyyy HH:mm' }}</p>
+          <p *ngIf="compra.entradas_compradas || compra.reserva_asientos?.length">
+            {{ compra.entradas_compradas || compra.reserva_asientos.length }} entrada(s)
+          </p>
+          <div class="compra-pie">
+            <strong>{{ compra.total | currency:'ARS':'symbol':'1.0-0' }}</strong>
+            <button
+              class="btn-ver-qr"
+              type="button"
+              *ngIf="!compra.cancelada_en"
+              [attr.aria-expanded]="qrCompraVisible() === compra.id"
+              (click)="alternarQrCompra(compra.id)">
+              {{ qrCompraVisible() === compra.id ? 'Ocultar QR' : 'Ver QR de entrada' }}
+            </button>
+            <button
+              class="btn-cancelar-compra"
+              type="button"
+              *ngIf="!compra.cancelada_en && !compra.entradas_retiradas && !compra.candy_retirado"
+              [disabled]="compraCancelando() !== null"
+              (click)="cancelarCompra(compra)">
+              {{ compraCancelando() === compra.id ? 'Cancelando...' : 'Cancelar y recibir créditos' }}
+            </button>
+            <small *ngIf="compra.cancelada_en">Devolución acreditada en tu saldo.</small>
+            <small *ngIf="!compra.cancelada_en && (compra.entradas_retiradas || compra.candy_retirado)">No se puede cancelar una compra utilizada.</small>
+          </div>
+          <div class="qr-compra" *ngIf="!compra.cancelada_en && qrCompraVisible() === compra.id">
+            <qrcode
+              [qrdata]="compra.id"
+              [width]="170"
+              [errorCorrectionLevel]="'M'"
+              [margin]="2"
+              colorDark="#000000"
+              colorLight="#ffffff">
+            </qrcode>
+            <small>Presentá este código en el cine.</small>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section class="seccion-cuenta" *ngIf="!cargando() && seccionActiva() === 'peliculas'">
+      <h2>Mis películas</h2>
+      <p class="vacio-cuenta" *ngIf="peliculasHistorial().length === 0">Las películas de tus compras aparecerán acá.</p>
+
+      <div class="historial-peliculas">
+        <article class="pelicula-historial" *ngFor="let pelicula of peliculasHistorial()">
+          <img [src]="pelicula.imagen" [alt]="pelicula.nombre">
+          <div class="pelicula-historial-info">
+            <h3>{{ pelicula.nombre }}</h3>
+            <p>{{ pelicula.generos?.join(', ') }}</p>
+            <small>Función: {{ pelicula.fecha_hora_inicio | date:'dd/MM/yyyy' }}</small>
+
+            <div class="resena-existente" *ngIf="resenaDe(pelicula.id) as resena">
+              <div class="estrellas-vista" [attr.aria-label]="resena.puntuacion + ' de 5 estrellas'">
+                <span *ngFor="let estrella of estrellas" [class.seleccionada]="estrella <= resena.puntuacion">★</span>
+              </div>
+              <p>{{ resena.comentario }}</p>
+            </div>
+
+            <button class="btn-resena" type="button" *ngIf="puedeResenar(pelicula.id)" (click)="iniciarResena(pelicula.id)">
+              {{ resenaDe(pelicula.id) ? 'Editar reseña' : 'Dejar reseña' }}
+            </button>
+            <small class="aviso-resena" *ngIf="!puedeResenar(pelicula.id)">Podrás reseñarla cuando se verifiquen tus entradas.</small>
+
+            <form class="formulario-resena" *ngIf="peliculaResenaActiva() === pelicula.id" [formGroup]="resenaForm" (ngSubmit)="guardarResena()">
+              <span>Tu calificación</span>
+              <div class="selector-estrellas" role="group" aria-label="Calificación de una a cinco estrellas">
+                <button
+                  type="button"
+                  *ngFor="let estrella of estrellas"
+                  [class.seleccionada]="estrella <= (resenaForm.controls.puntuacion.value || 0)"
+                  [attr.aria-label]="estrella + ' estrellas'"
+                  [attr.aria-pressed]="estrella === resenaForm.controls.puntuacion.value"
+                  (click)="seleccionarPuntuacion(estrella)">★</button>
+              </div>
+              <label>
+                Comentario corto
+                <textarea formControlName="comentario" maxlength="240" rows="3"></textarea>
+              </label>
+              <small class="error-resena" *ngIf="resenaForm.controls.comentario.touched && resenaForm.controls.comentario.invalid">Escribí un comentario de hasta 240 caracteres.</small>
+              <div class="acciones-resena">
+                <button class="btn-resena" type="submit" [disabled]="guardando()">Guardar reseña</button>
+                <button class="btn-cancelar-resena" type="button" (click)="cancelarResena()">Cancelar</button>
+              </div>
+            </form>
+          </div>
+        </article>
+      </div>
+    </section>
+  </section>
+</main>

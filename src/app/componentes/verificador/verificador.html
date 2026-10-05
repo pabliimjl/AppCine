@@ -1,0 +1,106 @@
+<div class="verificador-container">
+  <div class="header-verificador">
+    <h2>Control de Accesos</h2>
+    <p>Escanea el QR del cliente o ingresa el código</p>
+  </div>
+
+  <!-- Controles de Búsqueda -->
+  <div class="busqueda-panel">
+    <div class="input-grupo">
+      <input 
+        type="text" 
+        [ngModel]="codigoIngresado()" 
+        (ngModelChange)="codigoIngresado.set($event)"
+        placeholder="Ingrese el UUID de reserva..."
+      >
+      <button class="btn-buscar" (click)="buscarReserva()" [disabled]="cargando()">
+        Buscar
+      </button>
+    </div>
+    
+    <button class="btn-camara" (click)="toggleCamara()">
+      📷 {{ camaraActiva() ? 'Apagar Cámara' : 'Escanear QR' }}
+    </button>
+  </div>
+
+  <!-- Escáner Activo -->
+  <div class="escaner-wrapper" *ngIf="camaraActiva()">
+    <zxing-scanner 
+      [enable]="camaraActiva()" 
+      (scanSuccess)="onCodigoEscaneado($event)"
+      (camerasNotFound)="onCamaraNoEncontrada($event)"
+      (permissionResponse)="onPermisosDenegados($event)">
+    </zxing-scanner>
+    <div class="escaner-overlay">Enfoca el código QR</div>
+  </div>
+
+  <!-- Mensajes de Error/Carga -->
+  <div class="mensaje-error" *ngIf="error()">{{ error() }}</div>
+  <div class="mensaje-carga" *ngIf="cargando()">Procesando...</div>
+
+  <!-- Resultados de la Reserva -->
+  <div class="resultado-panel" *ngIf="reserva() && !cargando()">
+    <div class="reserva-header">
+      <h3>Reserva Confirmada</h3>
+      <span class="id-reserva">{{ reserva().id }}</span>
+    </div>
+
+    <!-- SECCIÓN: Cine -->
+    <div class="seccion-control">
+      <div class="info-bloque">
+        <h4>🎬 Entrada al Cine</h4>
+        <p><strong>Película:</strong> {{ reserva().pelicula?.nombre }}</p>
+        <p><strong>Butacas ({{ reserva().butacas?.length || 0 }}):</strong></p>
+        <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; margin-bottom: 10px;">
+        <span *ngFor="let butaca of reserva().butacas" 
+                style="background: #e4e4e7; padding: 4px 10px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; color: #18181b;">
+            {{ butaca.butaca_id }}
+        </span>
+        </div>
+      </div>
+      
+      <button 
+    class="btn-estado" 
+    [class.entregado]="reserva().entradas_retiradas"
+    [disabled]="reserva().entradas_retiradas || cargando()"
+    (click)="alternarEstado('entradas_retiradas')">
+    {{ reserva().entradas_retiradas ? '✅ Ya Ingresado' : '⏳ Marcar Ingreso' }}
+    </button>
+    </div>
+
+    <!-- SECCIÓN: Candy Bar -->
+    <div class="seccion-control" *ngIf="reserva().itemsCandy?.length > 0">
+      <div class="info-bloque">
+        <h4>🍿 Candy Bar</h4>
+        <ul class="lista-candy" style="list-style: none; padding-left: 0;">
+          <li *ngFor="let item of reserva().itemsCandy" style="margin-bottom: 12px; background: #fff; padding: 10px; border-radius: 8px; border: 1px solid #e4e4e7;">
+            
+            <!-- Título Principal (Ej: 1x Combo Pareja) -->
+            <div style="font-size: 1rem; color: #18181b; display: flex; gap: 8px;">
+              <span style="font-weight: 700; color: #e50914;">{{ item.cantidad }}x</span> 
+              <span style="font-weight: 600;">{{ item.nombre }}</span>
+            </div>
+
+            <!-- Descripción (Ej: 1 Pochoclo Grande + 2 Gaseosas) -->
+            <div *ngIf="item.descripcion" style="font-size: 0.85rem; color: #71717a; margin-top: 4px; padding-left: 22px;">
+              {{ item.descripcion }}
+            </div>
+            
+          </li>
+        </ul>
+      </div>
+      
+      <button 
+        class="btn-estado" 
+        [class.entregado]="reserva().candy_retirado"
+        [disabled]="reserva().candy_retirado || cargando()"
+        (click)="alternarEstado('candy_retirado')">
+        {{ reserva().candy_retirado ? '✅ Ya Entregado' : '⏳ Marcar Entregado' }}
+        </button>
+    </div>
+
+    <div *ngIf="!reserva().itemsCandy?.length" class="sin-candy">
+      Esta reserva no incluye productos de Candy Bar.
+    </div>
+  </div>
+</div>

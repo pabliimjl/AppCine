@@ -1,10 +1,14 @@
 <section class="cartelera-container">
+  <section class="seccion-proximamente">
+    <h2>Próximamente en nuestros cines</h2>
+    
+    <!-- Aquí se renderiza todo lo que hicimos en estrenos.html -->
+    <app-estrenos (preventaSeleccionada)="seleccionarPrimeraFuncion($event)"></app-estrenos>
+    
+  </section>
   <h2 class="cartelera-titulo">En Cartelera</h2>
-
-  <!-- Barra de días con flechas -->
   <div class="carrusel-fechas-container">
     
-    <!-- Flecha Izquierda -->
     <button class="btn-flecha" (click)="diaAnterior()" [disabled]="indiceActual === 0">
       &#10094;
     </button>
@@ -19,42 +23,71 @@
       </button>
     </div>
 
-    <!-- Flecha Derecha -->
     <button class="btn-flecha" (click)="siguienteDia()" [disabled]="indiceActual + 4 >= todosLosDias.length">
       &#10095;
     </button>
+    
 
   </div>
+  <p class="mensaje-preventa" *ngIf="mensajePreventa">{{ mensajePreventa }}</p>
+  <div class="buscador-cartelera">
+      <input 
+        type="text" 
+        placeholder="Buscar película por título..." 
+        [value]="terminoBusqueda"
+        (input)="actualizarBusqueda($event)"
+      >
+    </div>
+  
+    <div class="filtro-multiple-contenedor">
+    <span class="titulo-filtro">Filtrar por géneros:</span>
+    
+    <div class="chips-contenedor">
+      <button 
+        class="chip chip-limpiar" 
+        *ngIf="generosSeleccionados.length > 0"
+        (click)="generosSeleccionados = []; aplicarFiltroMultiple()">
+        ✕ Limpiar filtros
+      </button>
 
-  <!-- Grilla de Películas -->
+      <button 
+        *ngFor="let genero of conteoGeneros | keyvalue" 
+        class="chip"
+        [class.activo]="generosSeleccionados.includes(genero.key)"
+        (click)="toggleGenero(genero.key)">
+        {{ genero.key }} 
+      </button>
+    </div>
+  </div>
+
+  
   <div class="grid-peliculas" *ngIf="peliculasMostradas.length > 0; else noFunciones">
-    <article class="pelicula-card" *ngFor="let peli of peliculasMostradas">
+    <article class="pelicula-card" *ngFor="let peli of peliculasMostradas" [id]="'pelicula-' + peli.id">
       
-      <!-- Póster y Etiqueta de Estreno -->
       <div class="poster-wrapper">
         <img [src]="peli.imagen" [alt]="peli.nombre" class="poster-img">
         <span class="badge-estreno" *ngIf="esEstreno(peli.fecha_estreno)">NUEVO</span>
       </div>
       
-      <!-- Información de la Película y Horarios -->
       <div class="pelicula-info">
         <h3 class="pelicula-titulo">{{ peli.nombre }}</h3>
         <p class="pelicula-genero">{{ peli.generos?.join(', ') }}</p>
         
-        <!-- Lista de Horarios -->
         <div class="horarios-list">
-          <span class="horario-badge" *ngFor="let horario of peli.horarios">
-            {{ horario | date:'HH:mm' }}
-          </span>
+          <a 
+            class="horario-badge" 
+            *ngFor="let horario of peli.horarios"
+            [routerLink]="['/reserva', horario.funcion_id]"
+            style="cursor: pointer; text-decoration: none; display: inline-block;">
+            {{ horario.hora | date:'HH:mm' }}
+          </a>
         </div>
 
-        <button class="btn-reservar">Seleccionar Asientos</button>
       </div>
 
     </article>
   </div>
 
-  <!-- Estado Vacío (Sin funciones) -->
   <ng-template #noFunciones>
     <div class="no-funciones">
       <p>No hay funciones programadas para este día.</p>

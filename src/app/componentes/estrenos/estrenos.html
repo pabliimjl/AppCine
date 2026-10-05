@@ -1,0 +1,22 @@
+<!-- Cambiamos la clase aquí -->
+<div class="estrenos-carousel">
+  @for (peli of peliculasEstreno(); track peli.id) {
+    <div class="movie-card">
+      <img [src]="peli.imagen" [alt]="peli.nombre">
+      <h3>{{ peli.nombre }}</h3>
+      <p>Estreno: {{ peli.fecha_estreno | date:'dd-MM-yyyy' }}</p>
+
+      @if (peli.habilitarPreventa) {
+        <button class="btn-preventa" (click)="comprarPreventa(peli.id)">
+          Preventa
+        </button>
+      } @else {
+        <button class="btn-disabled" disabled>
+          Faltan {{ peli.diasParaEstreno }} días
+        </button>
+      }
+    </div>
+  } @empty {
+    <p>No hay próximos estrenos programados.</p>
+  }
+</div>

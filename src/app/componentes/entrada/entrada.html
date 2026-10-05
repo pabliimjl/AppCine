@@ -1,0 +1,91 @@
+<section class="ticket-container" *ngIf="datosTicket() as ticket">
+  
+  <div class="mensaje-exito">
+    <div class="check-icon">✓</div>
+    <h2>¡Compra Exitosa!</h2>
+    <p>Tu lugar está asegurado. 
+      <span *ngIf="emailEnviado()" class="badge-email">Ticket enviado a {{ emailUsuario() }}</span>
+    </p>
+    <div class="aviso-edad" role="note" *ngIf="esCompraAnonima() && detallesReserva()?.pelicula?.restriccion_edad as edad">
+      <strong>Clasificación +{{ edad }}</strong>
+      <p *ngIf="edad < 18">Para asistir, tenés que tener {{ edad }} años o más, o ir acompañado por un adulto.</p>
+      <p *ngIf="edad >= 18">Si sos menor de 18 años, tenés que asistir acompañado/a por una persona adulta.</p>
+    </div>
+  </div>
+
+  <!-- Ticket Visual -->
+  <div class="ticket-fisico">
+    
+    <!-- Lado Izquierdo: Info de la Película y Butacas -->
+    <div class="ticket-info">
+      <h3>CINE TICKET</h3>
+      <div class="separador"></div>
+      
+      <div class="detalle-grupo">
+        <label>Reserva Oficial</label>
+        <span class="uuid-text">{{ nroReserva() }}</span>
+      </div>
+
+      <div class="detalle-grupo">
+        <p></p>
+        <label>Tus Butacas ({{ ticket.butacas.length }})</label>
+        <ul class="butacas-list">
+          <li class="butaca-badge" *ngFor="let b of ticket.butacas">
+            Fila {{ b.fila }} - Asiento {{ b.numero }}
+          </li>
+        </ul>
+      </div>
+
+      <div class="detalle-grupo" *ngIf="ticket.itemsCandy?.length > 0">
+        <p></p>
+        <label>Candy Bar</label>
+        <ul class="candy-list">
+          <li *ngFor="let item of ticket.itemsCandy">
+            {{ item.cantidad }}x {{ item.nombre }}
+          </li>
+        </ul>
+      </div>
+
+      <div class="detalle-grupo" *ngIf="ticket.importeDescuento > 0">
+        <label>Descuento aplicado</label>
+        <span>-{{ ticket.importeDescuento | currency:'ARS':'symbol':'1.0-0' }}</span>
+      </div>
+      <div class="detalle-grupo">
+        <label>Total pagado</label>
+        <strong>{{ ticket.totalFinal | currency:'ARS':'symbol':'1.0-0' }}</strong>
+      </div>
+
+    </div>
+
+    <!-- Lado Derecho: Código QR -->
+    <div class="ticket-qr">
+      <div class="perforacion-arriba"></div>
+      <div class="perforacion-abajo"></div>
+      
+      <p>Para presentar en ingreso/candy</p>
+      
+      <!-- Componente QR: Le pasamos el ID de la reserva a la propiedad qrdata -->
+      <div class="qr-wrapper">
+        <qrcode 
+          [qrdata]="nroReserva()" 
+          [width]="160" 
+          [errorCorrectionLevel]="'M'"
+          [margin]="2"
+          colorDark="#000000"
+          colorLight="#ffffff">
+        </qrcode>
+      </div>
+      
+    </div>
+  </div>
+  <div class="acciones-entrada">
+    <button (click)="descargarPDF()" class="btn-descargar">
+      📥 Descargar PDF
+    </button>
+    
+    <button (click)="volverAlInicio()" class="btn-volver">
+      Volver a la cartelera
+    </button>
+  </div>
+
+</section>

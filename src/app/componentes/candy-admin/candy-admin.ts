@@ -25,6 +25,10 @@ export class CandyAdminComponent implements OnInit {
   cargando = signal<boolean>(false);
   mensajeExito = signal<string | null>(null);
   mensajeError = signal<string | null>(null);
+  imagenProductoSeleccionada: File | null = null;
+  imagenComboSeleccionada: File | null = null;
+  imagenProductoActual: string | null = null;
+  imagenComboActual: string | null = null;
 
   // Estados para edición
   productoEditandoId = signal<string | null>(null);
@@ -39,7 +43,6 @@ export class CandyAdminComponent implements OnInit {
   productoForm: FormGroup = this.fb.group({
     nombre: ['', Validators.required],
     precio: [0, [Validators.required, Validators.min(0)]],
-    imagen: ['', Validators.required],
     categoria_id: ['', Validators.required],
     stock: [50, [Validators.required, Validators.min(0)]]
   });
@@ -48,7 +51,6 @@ export class CandyAdminComponent implements OnInit {
     nombre: ['', Validators.required],
     descripcion: ['', Validators.required],
     precio_combo: [0, [Validators.required, Validators.min(0)]],
-    imagen: ['', Validators.required],
     producto_temporal: [''],
     cantidad_temporal: [1, [Validators.min(1)]]
   });
@@ -100,29 +102,55 @@ export class CandyAdminComponent implements OnInit {
   }
 
   async guardarProducto() {
-    if (this.productoForm.invalid) return;
+    if (this.productoForm.invalid || (!this.imagenProductoSeleccionada && !this.imagenProductoActual)) {
+      this.mensajeError.set('Completa los campos requeridos y selecciona una imagen.');
+      return;
+    }
     const supabase = (this.supabaseService as any).supabase;
+    this.cargando.set(true);
+    this.mensajeError.set(null);
+    this.mensajeExito.set(null);
+
+    let imagen = this.imagenProductoActual;
+    if (this.imagenProductoSeleccionada) {
+      try {
+        imagen = await this.supabaseService.subirImagen(this.imagenProductoSeleccionada, 'candy');
+      } catch (error) {
+        this.cargando.set(false);
+        const detalle = error instanceof Error ? error.message : String(error);
+        this.mensajeError.set(`Error al subir la imagen del producto: ${detalle}`);
+        return;
+      }
+    }
+
+    const producto = { ...this.productoForm.value, imagen };
 
     if (this.productoEditandoId()) {
       const { error } = await supabase
         .from('candy_productos')
-        .update(this.productoForm.value)
+        .update(producto)
         .eq('id', this.productoEditandoId());
 
       if (error) {
+        this.cargando.set(false);
         this.mensajeError.set('Error al actualizar: ' + error.message);
       } else {
+        this.cargando.set(false);
         this.mensajeExito.set('¡Producto actualizado con éxito!');
         this.cancelarEdicion();
         await this.cargarDatos();
       }
     } else {
-      const { error } = await supabase.from('candy_productos').insert([this.productoForm.value]);
+      const { error } = await supabase.from('candy_productos').insert([producto]);
       if (error) {
+        this.cargando.set(false);
         this.mensajeError.set('Error: ' + error.message);
       } else {
+        this.cargando.set(false);
         this.mensajeExito.set('¡Producto agregado con éxito!');
         this.productoForm.reset();
+        this.imagenProductoSeleccionada = null;
+        this.imagenProductoActual = null;
         await this.cargarDatos();
       }
     }
@@ -133,10 +161,11 @@ export class CandyAdminComponent implements OnInit {
     this.productoForm.patchValue({
       nombre: prod.nombre,
       precio: prod.precio,
-      imagen: prod.imagen,
       categoria_id: prod.categoria_id,
       stock: prod.stock
     });
+    this.imagenProductoActual = prod.imagen;
+    this.imagenProductoSeleccionada = null;
   }
 
   async eliminarProducto(id: string) {
@@ -175,12 +204,27 @@ export class CandyAdminComponent implements OnInit {
       this.mensajeError.set('Completa los datos del combo y añade al menos un producto.');
       return;
     }
+    if (!this.imagenComboSeleccionada && !this.imagenComboActual) {
+      this.mensajeError.set('Selecciona una imagen para el combo.');
+      return;
+    }
 
     const supabase = (this.supabaseService as any).supabase;
     this.cargando.set(true);
     this.mensajeError.set(null);
 
-    const { nombre, descripcion, precio_combo, imagen } = this.comboForm.value;
+    const { nombre, descripcion, precio_combo } = this.comboForm.value;
+    let imagen = this.imagenComboActual;
+    if (this.imagenComboSeleccionada) {
+      try {
+        imagen = await this.supabaseService.subirImagen(this.imagenComboSeleccionada, 'combos');
+      } catch (error) {
+        this.cargando.set(false);
+        const detalle = error instanceof Error ? error.message : String(error);
+        this.mensajeError.set(`Error al subir la imagen del combo: ${detalle}`);
+        return;
+      }
+    }
 
     if (this.comboEditandoId()) {
       const { error: comboError } = await supabase
@@ -243,9 +287,10 @@ export class CandyAdminComponent implements OnInit {
     this.comboForm.patchValue({
       nombre: combo.nombre,
       descripcion: combo.descripcion,
-      precio_combo: combo.precio_combo,
-      imagen: combo.imagen
+      precio_combo: combo.precio_combo
     });
+    this.imagenComboActual = combo.imagen;
+    this.imagenComboSeleccionada = null;
 
     const itemsMapeados = combo.candy_combo_items.map((i: any) => ({
       producto_id: i.producto_id, // <--- AHORA SE ASIGNA EL ID CORRECTAMENTE
@@ -274,5 +319,19 @@ export class CandyAdminComponent implements OnInit {
     this.productoForm.reset();
     this.comboForm.reset();
     this.productosEnCombo.set([]);
+    this.imagenProductoSeleccionada = null;
+    this.imagenComboSeleccionada = null;
+    this.imagenProductoActual = null;
+    this.imagenComboActual = null;
+  }
+
+  seleccionarImagenProducto(event: Event) {
+    const input = event.target as HTMLInputElement;
+    this.imagenProductoSeleccionada = input.files?.[0] ?? null;
+  }
+
+  seleccionarImagenCombo(event: Event) {
+    const input = event.target as HTMLInputElement;
+    this.imagenComboSeleccionada = input.files?.[0] ?? null;
   }
 }

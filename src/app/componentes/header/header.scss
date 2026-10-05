@@ -50,6 +50,20 @@
       font-weight: 500;
     }
 
+    .enlace-perfil {
+      color: #d4d4d8;
+      font-weight: 600;
+      text-decoration: none;
+      transition: color 0.2s ease;
+
+      &:hover,
+      &.activo {
+        color: #fff;
+        text-decoration: underline;
+        text-underline-offset: 4px;
+      }
+    }
+
     .texto-invitado {
       color: #a3a3a3;
       font-style: italic;
@@ -69,6 +83,22 @@
         background: #e50914;
         color: white;
       }
+    }
+  }
+}
+
+@media (max-width: 560px) {
+  .app-header {
+    padding: 0.85rem 1rem;
+
+    .usuario-logueado,
+    .invitado-bloque {
+      gap: 0.65rem;
+    }
+
+    .saludo {
+      max-width: 140px;
+      overflow-wrap: anywhere;
     }
   }
 }

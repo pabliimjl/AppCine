@@ -1,0 +1,221 @@
+
+
+/* --- Mensaje Superior --- */
+.mensaje-exito {
+  text-align: center;
+  margin-bottom: 40px;
+  
+  .check-icon {
+    width: 56px;
+    height: 56px;
+    background-color: #22c55e; /* Verde más moderno y vibrante */
+    color: white;
+    font-size: 1.8rem;
+    line-height: 56px;
+    border-radius: 50%;
+    margin: 0 auto 16px;
+    box-shadow: 0 8px 20px rgba(34, 197, 94, 0.25);
+  }
+
+  h2 { 
+    color: #ffffff; 
+    font-size: 1.8rem; 
+    font-weight: 600;
+    margin: 0 0 8px; 
+    letter-spacing: -0.5px;
+  }
+  
+  p { 
+    color: #a1a1aa; 
+    font-size: 1rem;
+  }
+
+  .badge-email {
+    display: inline-block;
+    margin-top: 12px;
+    font-size: 0.85rem;
+    color: #38bdf8;
+    background: rgba(56, 189, 248, 0.1);
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-weight: 500;
+  }
+
+  .aviso-edad {
+    max-width: 560px;
+    margin: 16px auto 0;
+    padding: 12px 16px;
+    border-left: 4px solid #f97316;
+    border-radius: 4px;
+    background: #fff7ed;
+    color: #7c2d12;
+    text-align: left;
+
+    p {
+      margin: 5px 0 0;
+      line-height: 1.45;
+    }
+  }
+}
+
+.ticket-container {
+  width: 100%; /* Añadido */
+  max-width: 700px;
+  margin: 40px auto;
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box; /* Añadido: Evita que el padding sume ancho */
+}
+
+.ticket-fisico {
+  display: flex;
+  width: 100%;
+  box-sizing: border-box; /* Añadido */
+  background: #ffffff; 
+  border-radius: 16px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  color: #18181b;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.ticket-info {
+  flex: 1;
+  padding: 40px;
+  box-sizing: border-box; /* Añadido */
+  border-right: 1px solid #f4f4f5;
+  /* ... resto de tu código h3, .separador ... */
+}
+
+/* --- Lado del QR --- */
+.ticket-qr {
+  width: 280px;
+  padding: 40px 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #fafafa; /* Un gris hiper sutil para diferenciar la zona */
+
+  p {
+    margin: 0 0 20px;
+    font-weight: 600;
+    color: #71717a;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 1.5px;
+    text-align: center;
+  }
+
+  .qr-wrapper {
+    background: #fff;
+    padding: 16px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    border: 1px solid #f4f4f5;
+  }
+}
+
+/* --- Móvil --- */
+@media (max-width: 650px) {
+  .ticket-fisico { 
+    flex-direction: column; 
+  }
+  
+  .ticket-info { 
+    border-right: none; 
+    border-bottom: 1px solid #f4f4f5; 
+    padding: 30px 20px;
+  }
+  
+  .ticket-qr { 
+    width: 100%; 
+    padding: 30px 20px;
+  }
+}
+
+
+/* --- Contenedor de los botones (Se mantiene igual, ya era moderno) --- */
+.acciones-entrada {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  align-items: center;
+  justify-content: center;
+  margin-top: 40px;
+  padding: 20px 0;
+
+  @media (min-width: 600px) {
+    flex-direction: row;
+  }
+}
+
+.btn-descargar,
+.btn-volver {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  padding: 12px 24px;
+  border-radius: 10px; /* Acorde a los nuevos bordes */
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+  
+  @media (min-width: 600px) {
+    width: auto;
+  }
+}
+
+.btn-descargar {
+  background-color: #e50914;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(229, 9, 20, 0.3);
+
+  &:hover {
+    background-color: #c90812;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(229, 9, 20, 0.4);
+  }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(229, 9, 20, 0.2);
+  }
+}
+
+.btn-volver {
+  background-color: rgba(255,255,255,0.1);
+  color: #ffffff;
+  border: 1px solid rgba(255,255,255,0.2);
+  backdrop-filter: blur(10px);
+
+  &:hover {
+    background-color: rgba(255,255,255,0.15);
+    border-color: rgba(255,255,255,0.3);
+  }
+}
+/* --- Móvil --- */
+@media (max-width: 650px) {
+  .ticket-fisico { 
+    flex-direction: column; 
+  }
+  
+  .ticket-info { 
+    border-right: none; 
+    border-bottom: 1px solid #f4f4f5; 
+    padding: 30px 20px;
+    width: 100%; /* Asegura que no sobrepase */
+  }
+  
+  .ticket-qr { 
+    width: 100%; 
+    padding: 30px 20px;
+    box-sizing: border-box; /* Asegura que el padding no lo empuje afuera */
+  }
+}

@@ -1,0 +1,95 @@
+<div class="contenedor-sala">
+  <h2>Selecciona tus butacas</h2>
+
+  <div class="aviso-edad" role="note" *ngIf="esCompraAnonima() && detalleFuncion()?.peliculas?.restriccion_edad as edad">
+    <strong>Clasificación +{{ edad }}</strong>
+    <p *ngIf="edad < 18">Para asistir, tenés que tener {{ edad }} años o más, o ir acompañado por un adulto.</p>
+    <p *ngIf="edad >= 18">Si sos menor de 18 años, tenés que asistir acompañado/a por una persona adulta.</p>
+  </div>
+
+  <!-- Representación de la Pantalla -->
+  <div class="pantalla-escenario">
+    <div class="pantalla">PANTALLA</div>
+  </div>
+
+  <!-- Leyenda descriptiva -->
+  <div class="leyenda">
+    <div class="item"><span class="caja libre"></span> Libre</div>
+    <div class="item"><span class="caja ocupado"></span> Ocupado</div>
+    <div class="item"><span class="caja seleccionado"></span> Tu Selección</div>
+    <div class="item"><span class="caja vip"></span> VIP</div>
+    <div class="item"><span class="caja accesible"></span> Accesible (Silla Ruedas)</div>
+  </div>
+  <div class="temporizador-reserva" *ngIf="butacasSeleccionadas().length > 0">
+  Tiempo para completar la compra: 
+  <span class="reloj" [class.peligro]="tiempoRestante() < 60">
+    {{ minutosFormat() }}:{{ segundosFormat() }}
+  </span>
+  </div>
+    <!-- Mapa de butacas -->
+  <div class="mapa">
+    <!-- Agregamos [attr.data-fila] para identificar la fila en CSS -->
+    <div class="fila" *ngFor="let filaData of mapaButacas()" [attr.data-fila]="filaData.fila">
+      <div class="letra-fila">{{ filaData.fila }}</div>
+
+      <div class="asientos-contenedor">
+        <button 
+          *ngFor="let asiento of filaData.asientos; let i = index"
+          class="asiento"
+          [ngClass]="[asiento.tipo, asiento.estado]"
+          [style.grid-column]="columnaButaca(filaData.fila, i)"
+          (click)="toggleAsiento(asiento)"
+          [disabled]="asiento.estado === 'ocupado'"
+          [title]="'Fila ' + asiento.fila + ' - Asiento ' + asiento.numero"
+        >
+          {{ asiento.numero }}
+        </button>
+      </div>
+
+      <div class="letra-fila">{{ filaData.fila }}</div>
+    </div>
+  </div>
+  <!-- Nuevo contenedor de detalles (justo arriba del resumen inferior) -->
+  <div class="detalle-reserva-info" *ngIf="detalleFuncion() as df">
+    
+    <div class="info-peli-mini">
+      <img [src]="df.peliculas.imagen" [alt]="df.peliculas.nombre">
+      <div class="textos-peli">
+        <h4>{{ df.peliculas.nombre }}</h4>
+        <p>{{ df.fecha_hora_inicio | date:'dd/MM/yyyy HH:mm' }} | {{ df.salas.nombre }}</p>
+      </div>
+    </div>
+
+    <div class="info-entradas-mini">
+      <h4>Entradas requeridas:</h4>
+      <ul>
+        <li *ngIf="entradasAComprar().general > 0">
+          <span class="cantidad">{{ entradasAComprar().general }}x</span> General
+        </li>
+        <li *ngIf="entradasAComprar().discapacitado > 0">
+          <span class="cantidad">{{ entradasAComprar().discapacitado }}x</span> Discapacitado
+        </li>
+        <li *ngIf="entradasAComprar().vip > 0">
+          <span class="cantidad">{{ entradasAComprar().vip }}x</span> VIP
+        </li>
+      </ul>
+    </div>
+
+  </div>
+
+
+  <div class="resumen-inferior">
+  <div class="info-total">
+    <h3>Total a abonar: {{ totalPagar() | currency:'ARS':'symbol':'1.0-0' }}</h3>
+    <p class="estado-seleccion" [class.completo]="seleccionCompleta()">
+      Butacas seleccionadas: {{ butacasSeleccionadas().length }}
+    </p>
+  </div>
+
+  <button 
+    class="btn-siguiente" 
+    [disabled]="!seleccionCompleta()" 
+    (click)="continuarAlCandy()">
+    Continuar al Candy
+  </button>
+</div>

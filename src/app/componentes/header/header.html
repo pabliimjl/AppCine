@@ -9,6 +9,7 @@
       
       <div class="usuario-logueado">
         <span class="saludo">¡Bienvenido, {{ nombreUsuario() }}!</span>
+        <a class="enlace-perfil" routerLink="/perfil" routerLinkActive="activo">Mi Perfil</a>
         <button class="btn-cerrar" (click)="cerrarSesion()">Salir</button>
       </div>
       

@@ -1,0 +1,473 @@
+/* Contenedor Principal */
+.pago-container {
+  max-width: 650px;
+  margin: 40px auto;
+  padding: 30px;
+  background-color: #1a1a1a;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  border: 1px solid #333;
+  color: #e0e0e0;
+}
+
+/* Cabecera */
+.resumen-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #333;
+
+  h2 { 
+    margin: 0; 
+    font-size: 1.6rem; 
+    color: #ffffff; 
+  }
+
+  .total-badge {
+    background-color: #121212;
+    border: 1px solid #444;
+    color: #aaa;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 1.1rem;
+
+    span { 
+      color: #e50914; 
+      font-weight: 700; 
+      margin-left: 5px;
+      font-size: 1.2rem;
+    }
+  }
+}
+
+.descuentos-pago {
+  margin: -8px 0 28px;
+  padding: 18px;
+  border: 1px solid #3d3d3d;
+  border-radius: 8px;
+  background: #202020;
+
+  h3 {
+    margin: 0 0 14px;
+    color: #fff;
+    font-size: 1.05rem;
+  }
+
+  .fecha-nacimiento,
+  .cupon {
+    display: grid;
+    gap: 7px;
+    margin-top: 12px;
+
+    label {
+      color: #bbb;
+      font-size: 0.9rem;
+    }
+
+    input {
+      min-width: 0;
+      padding: 11px;
+      border: 1px solid #444;
+      border-radius: 4px;
+      background: #121212;
+      color: #fff;
+      font: inherit;
+    }
+
+    small {
+      color: #999;
+      line-height: 1.4;
+    }
+  }
+
+  .fila-cupon {
+    display: flex;
+    gap: 8px;
+
+    input {
+      flex: 1;
+      width: 0;
+      text-transform: uppercase;
+    }
+
+    button {
+      flex: 0 0 auto;
+      padding: 0 16px;
+      border: 0;
+      border-radius: 4px;
+      background: #e50914;
+      color: #fff;
+      font-weight: 600;
+      cursor: pointer;
+    }
+  }
+
+  .mensaje-descuento {
+    margin: 12px 0 0;
+    color: #aaa;
+    font-size: 0.88rem;
+  }
+
+  .resumen-descuento {
+    display: grid;
+    gap: 6px;
+    margin-top: 14px;
+    color: #b7e4c7;
+    font-size: 0.9rem;
+  }
+}
+
+/* Opciones de Pago (Botones grandes) */
+.opciones-pago {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 30px;
+
+  .tarjeta-opcion {
+    flex: 1;
+    background-color: #121212;
+    border: 2px solid #333;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    h4 { 
+      margin: 12px 0 0; 
+      color: #888; 
+      font-size: 1rem; 
+      transition: color 0.3s;
+    }
+    
+    .icono-mp, .icono-tarjeta { 
+      font-size: 2.5rem; 
+      font-weight: bold; 
+    }
+
+    .icono-creditos {
+      display: grid;
+      width: 2.5rem;
+      height: 2.5rem;
+      margin: 0 auto;
+      place-items: center;
+      border: 1px solid #e50914;
+      border-radius: 50%;
+      color: #ff6870;
+      font-size: 0.75rem;
+      font-weight: 800;
+    }
+
+    p {
+      margin: 8px 0 0;
+      color: #aaa;
+      font-size: 0.85rem;
+    }
+    
+    .icono-mp { color: #444; transition: color 0.3s; }
+
+    &:hover { 
+      border-color: #555; 
+      transform: translateY(-3px); 
+    }
+
+    /* Estados Activos */
+    &.activa {
+      background-color: #222;
+      border-color: #e50914; /* Rojo por defecto para tarjeta */
+      
+      h4 { color: #ffffff; }
+
+      &.mp { 
+        border-color: #009ee3; /* Azul Mercado Pago */
+        .icono-mp { color: #009ee3; }
+      }
+    }
+  }
+}
+
+/* Animación compartida para los flujos */
+.flujo-mp, .flujo-tarjeta {
+  animation: deslizarArriba 0.4s ease-out;
+}
+
+.flujo-creditos {
+  padding: 20px;
+  border: 1px solid #383838;
+  border-radius: 8px;
+  background: #121212;
+  animation: deslizarArriba 0.4s ease-out;
+
+  p {
+    margin: 0 0 10px;
+    color: #aaa;
+  }
+
+  .saldo-pago strong {
+    color: #e50914;
+  }
+
+  .faltan-creditos {
+    color: #ff8b91;
+  }
+
+  .creditos-btn {
+    margin-top: 6px;
+    background: #e50914;
+
+    &:hover:not(:disabled) {
+      background: #ff0a16;
+    }
+
+    &:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+  }
+}
+
+.error-pago {
+  margin: -10px 0 20px;
+  color: #ff8b91;
+}
+
+.aporte-creditos {
+  margin: -8px 0 22px;
+  padding: 14px 16px;
+  border: 1px solid #3d3d3d;
+  border-left: 3px solid #e50914;
+  border-radius: 4px;
+  background: #202020;
+}
+
+.usar-creditos-control {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #e0e0e0;
+  cursor: pointer;
+
+  input {
+    width: 18px;
+    height: 18px;
+    accent-color: #e50914;
+  }
+}
+
+.desglose-combinado {
+  display: grid;
+  gap: 6px;
+  margin: 12px 0 0 28px;
+  padding-top: 10px;
+  border-top: 1px solid #3a3a3a;
+  color: #aaa;
+  font-size: 0.9rem;
+
+  strong {
+    color: #ff6870;
+  }
+}
+
+/* Flujo 1: Mercado Pago */
+.flujo-mp {
+  text-align: center;
+  background-color: #121212;
+  padding: 30px;
+  border-radius: 10px;
+  border: 1px solid #333;
+
+  .qr-box {
+    background: #ffffff;
+    display: inline-block;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    box-shadow: 0 4px 15px rgba(0, 158, 227, 0.2);
+
+    img { 
+      display: block; 
+      width: 180px; 
+      height: 180px; 
+    }
+  }
+
+  p { 
+    color: #aaa; 
+    margin-bottom: 25px; 
+    font-size: 1.05rem;
+  }
+
+  .mp-btn { 
+    background-color: #009ee3; 
+    &:hover { background-color: #0087c1; }
+  }
+}
+
+/* Flujo 2: Formulario de Tarjeta */
+.flujo-tarjeta {
+  .form-grupo {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+
+    label { 
+      margin-bottom: 8px; 
+      color: #bbb; 
+      font-size: 0.95rem; 
+    }
+
+    input {
+      background-color: #121212;
+      border: 1px solid #444;
+      color: #ffffff;
+      padding: 15px;
+      border-radius: 8px;
+      font-size: 1.05rem;
+      outline: none;
+      transition: all 0.3s ease;
+      font-family: inherit;
+
+      &::placeholder { color: #555; }
+      &:focus { 
+        border-color: #e50914; 
+        box-shadow: 0 0 10px rgba(229, 9, 20, 0.1);
+      }
+    }
+  }
+
+  .fila-doble {
+    display: flex;
+    gap: 20px;
+    .form-grupo { flex: 1; }
+  }
+
+  .input-con-icono {
+    position: relative;
+    input { 
+      width: 100%; 
+      padding-right: 60px; /* Espacio para el icono de la marca */
+      box-sizing: border-box; 
+    }
+
+    .marca-tarjeta {
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-weight: 800;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      
+      /* Colores según la marca detectada */
+      &.visa { color: #1a1f71; background: #fff; padding: 2px 6px; border-radius: 4px; }
+      &.mastercard { color: #eb001b; }
+      &.amex { color: #2e77bc; }
+    }
+  }
+
+  .error { 
+    color: #e50914; 
+    font-size: 0.85rem; 
+    margin-top: 6px; 
+  }
+
+  .tarjeta-btn {
+    background-color: #e50914;
+    &:hover { background-color: #ff0a16; }
+  }
+}
+
+/* Botón Base */
+.btn-pagar {
+  width: 100%;
+  padding: 16px;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+/* Estado de Carga (Spinner) */
+.pantalla-carga {
+  text-align: center;
+  padding: 60px 20px;
+  animation: deslizarArriba 0.3s ease;
+
+  .spinner {
+    width: 60px;
+    height: 60px;
+    border: 5px solid #333;
+    border-top-color: #e50914;
+    border-radius: 50%;
+    margin: 0 auto 25px;
+    animation: girar 1s linear infinite;
+  }
+
+  h3 { 
+    color: #ffffff; 
+    margin-bottom: 10px; 
+    font-size: 1.4rem;
+  }
+  
+  p { 
+    color: #aaa; 
+    font-size: 1.05rem;
+  }
+}
+
+/* Keyframes */
+@keyframes deslizarArriba { 
+  from { opacity: 0; transform: translateY(15px); } 
+  to { opacity: 1; transform: translateY(0); } 
+}
+@keyframes girar { 
+  to { transform: rotate(360deg); } 
+}
+
+@media (max-width: 640px) {
+  .pago-container {
+    width: calc(100% - 24px);
+    margin: 16px auto;
+    padding: 20px 16px;
+    box-sizing: border-box;
+  }
+
+  .resumen-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .descuentos-pago .fila-cupon button {
+    padding: 0 10px;
+  }
+
+  .opciones-pago {
+    flex-direction: column;
+  }
+}
+
+/* Responsividad para móviles */
+@media (max-width: 600px) {
+  .opciones-pago { 
+    flex-direction: column; 
+    gap: 15px; 
+  }
+  .resumen-header { 
+    flex-direction: column; 
+    gap: 15px; 
+    text-align: center; 
+  }
+  .flujo-tarjeta .fila-doble { 
+    flex-direction: column; 
+    gap: 0; 
+  }
+}

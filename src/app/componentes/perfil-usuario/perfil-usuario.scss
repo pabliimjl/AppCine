@@ -1,0 +1,640 @@
+.perfil-pagina {
+  width: min(100% - 32px, 760px);
+  margin: 32px auto 56px;
+  color: #f4f4f5;
+}
+
+.volver-cartelera {
+  display: inline-block;
+  margin-bottom: 16px;
+  color: #c4c4c8;
+  text-decoration: none;
+
+  &:hover {
+    color: #ff6870;
+  }
+}
+
+.perfil-panel {
+  padding: 28px;
+  border: 1px solid #333;
+  border-radius: 8px;
+  background: #1a1a1a;
+}
+
+.perfil-cabecera {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+
+  h1 {
+    margin: 0;
+    font-size: 1.6rem;
+  }
+
+  p {
+    margin: 5px 0 0;
+    color: #a1a1aa;
+  }
+}
+
+.avatar-perfil {
+  display: grid;
+  width: 52px;
+  aspect-ratio: 1;
+  place-items: center;
+  border-radius: 50%;
+  background: #e50914;
+  color: white;
+  font-size: 1.4rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.perfil-panel form {
+  display: grid;
+  gap: 18px;
+}
+
+.campos-dobles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.campo-perfil {
+  display: grid;
+  min-width: 0;
+  gap: 7px;
+  color: #d4d4d8;
+  font-size: 0.9rem;
+
+  input {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 44px;
+    padding: 10px 12px;
+    border: 1px solid #48484f;
+    border-radius: 4px;
+    outline: none;
+    background: #121214;
+    color: #fff;
+    font: inherit;
+
+    &:focus {
+      border-color: #e50914;
+    }
+  }
+
+  small {
+    color: #ff8b91;
+  }
+
+  &.solo-lectura input {
+    background: #252529;
+    color: #aaa;
+    cursor: not-allowed;
+  }
+}
+
+.estado-formulario {
+  margin: 0 0 18px;
+  padding: 12px;
+  border-radius: 4px;
+
+  &.error {
+    border: 1px solid #81343a;
+    background: #3b1d20;
+    color: #ffc6ca;
+  }
+
+  &.exito {
+    border: 1px solid #286542;
+    background: #183425;
+    color: #b9f6ce;
+  }
+}
+
+.cargando-perfil {
+  padding: 24px 0;
+  color: #a1a1aa;
+}
+
+.guardar-perfil {
+  justify-self: start;
+  min-height: 44px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 4px;
+  background: #e50914;
+  color: white;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.65;
+    cursor: wait;
+  }
+}
+
+.menu-perfil {
+  display: flex;
+  gap: 4px;
+  margin: 0 -4px 22px;
+  overflow-x: auto;
+  border-bottom: 1px solid #3a3a40;
+
+  button {
+    flex: 0 0 auto;
+    min-height: 44px;
+    padding: 0 12px;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    background: transparent;
+    color: #aaa;
+    font: inherit;
+    cursor: pointer;
+
+    &:hover,
+    &.activo {
+      border-bottom-color: #e50914;
+      color: #fff;
+    }
+  }
+}
+
+.seccion-cuenta {
+  h2 {
+    margin: 0 0 16px;
+    font-size: 1.2rem;
+  }
+}
+
+.saldo-creditos {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 28px;
+  padding: 20px;
+  border-left: 4px solid #e50914;
+  border-radius: 4px;
+  background: #202020;
+
+  span,
+  small {
+    color: #aaa;
+  }
+
+  strong {
+    color: #fff;
+    font-size: 1.7rem;
+  }
+
+  small {
+    color: #ff8b91;
+  }
+}
+
+.saldo-puntos {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 20px;
+  padding: 20px;
+  border-left: 4px solid #e50914;
+  border-radius: 4px;
+  background: #202020;
+
+  span,
+  small {
+    color: #aaa;
+  }
+
+  strong {
+    color: #fff;
+    font-size: 1.7rem;
+  }
+}
+
+.canje-puntos {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 28px;
+  padding: 18px;
+  border: 1px solid #383838;
+  border-radius: 6px;
+  background: #121212;
+
+  h2,
+  p {
+    margin: 0;
+  }
+
+  p {
+    color: #aaa;
+    line-height: 1.45;
+  }
+
+  label {
+    display: grid;
+    gap: 7px;
+    color: #d4d4d8;
+    font-size: 0.9rem;
+  }
+
+  input {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 300px;
+    min-height: 42px;
+    padding: 9px 11px;
+    border: 1px solid #48484f;
+    border-radius: 4px;
+    background: #202020;
+    color: #fff;
+    font: inherit;
+
+    &:focus {
+      outline: none;
+      border-color: #e50914;
+    }
+  }
+
+  .estimado-canje {
+    color: #ff6870;
+    font-weight: 600;
+  }
+
+  button {
+    justify-self: start;
+    min-height: 40px;
+    padding: 0 14px;
+    border: 0;
+    border-radius: 4px;
+    background: #e50914;
+    color: #fff;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+
+    &:hover:not(:disabled) {
+      background: #ff0a16;
+    }
+
+    &:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+  }
+}
+
+.movimiento-puntos > strong:not(.debito-creditos) {
+  color: #ff6870;
+}
+
+.vacio-cuenta {
+  padding: 24px 0;
+  color: #a1a1aa;
+}
+
+.lista-movimientos {
+  border-top: 1px solid #3a3a40;
+}
+
+.movimiento-credito {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid #3a3a40;
+
+  div {
+    display: grid;
+    gap: 5px;
+  }
+
+  small {
+    color: #a1a1aa;
+  }
+
+  > strong {
+    color: #9be2b7;
+    text-align: right;
+
+    &.debito-creditos {
+      color: #ff9a9f;
+    }
+  }
+}
+
+.compra-usuario {
+  display: grid;
+  grid-template-columns: 104px minmax(0, 1fr);
+  gap: 18px;
+  margin-top: 14px;
+  padding: 14px;
+  border: 1px solid #38383e;
+  border-radius: 6px;
+  background: #202023;
+
+  > img {
+    width: 100%;
+    aspect-ratio: 2 / 3;
+    border-radius: 4px;
+    object-fit: cover;
+  }
+}
+
+.compra-detalle {
+  min-width: 0;
+
+  p {
+    margin: 7px 0;
+    color: #a1a1aa;
+  }
+}
+
+.compra-titulo-fila,
+.compra-pie {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.compra-titulo-fila h3 {
+  min-width: 0;
+  margin: 0;
+  font-size: 1.05rem;
+  overflow-wrap: anywhere;
+}
+
+.estado-compra {
+  flex: 0 0 auto;
+  color: #a7e1bc;
+  font-size: 0.82rem;
+
+  &.cancelada {
+    color: #b4b4bb;
+  }
+}
+
+.btn-ver-qr {
+  min-height: 38px;
+  padding: 0 12px;
+  border: 1px solid #555;
+  border-radius: 4px;
+  background: #121212;
+  color: #ddd;
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+
+  &:hover {
+    border-color: #e50914;
+    color: #fff;
+  }
+}
+
+.qr-compra {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  width: fit-content;
+  margin-top: 14px;
+  padding: 12px;
+  border-radius: 4px;
+  background: #fff;
+
+  small {
+    color: #333;
+  }
+}
+
+.compra-pie {
+  flex-wrap: wrap;
+  margin-top: 12px;
+
+  > strong {
+    color: #fff;
+  }
+
+  .btn-cancelar-compra {
+    min-height: 38px;
+    padding: 0 12px;
+    border: 1px solid #6b3539;
+    border-radius: 4px;
+    background: transparent;
+    color: #ff9a9f;
+    font: inherit;
+    font-size: 0.85rem;
+    cursor: pointer;
+
+    &:hover:not(:disabled) {
+      border-color: #e50914;
+      background: #35191b;
+      color: #fff;
+    }
+
+    &:disabled {
+      opacity: 0.55;
+      cursor: wait;
+    }
+  }
+
+  small {
+    flex-basis: 100%;
+    color: #a1a1aa;
+  }
+}
+
+.historial-peliculas {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 16px;
+}
+
+.pelicula-historial {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid #38383e;
+  border-radius: 6px;
+  background: #202023;
+
+  > img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 2 / 3;
+    object-fit: cover;
+    background: #121214;
+  }
+}
+
+.pelicula-historial-info {
+  padding: 12px;
+
+  h3 {
+    margin: 0;
+    overflow-wrap: anywhere;
+    font-size: 1rem;
+  }
+
+  p {
+    margin: 6px 0;
+    color: #b4b4bb;
+    overflow-wrap: anywhere;
+  }
+
+  > small {
+    color: #92929a;
+  }
+}
+
+.estrellas-vista,
+.selector-estrellas {
+  display: flex;
+  gap: 3px;
+  color: #73737b;
+  font-size: 1.3rem;
+
+  .seleccionada {
+    color: #ffc247;
+  }
+}
+
+.resena-existente {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid #38383e;
+}
+
+.btn-resena {
+  margin-top: 12px;
+  min-height: 36px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 4px;
+  background: #e50914;
+  color: #fff;
+  font: inherit;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    background: #ff0a16;
+  }
+}
+
+.aviso-resena {
+  display: block;
+  margin-top: 12px;
+  color: #aaa;
+  line-height: 1.4;
+}
+
+.formulario-resena {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid #38383e;
+
+  > span,
+  label {
+    color: #d4d4d8;
+    font-size: 0.9rem;
+  }
+
+  label {
+    display: grid;
+    gap: 7px;
+  }
+
+  textarea {
+    box-sizing: border-box;
+    width: 100%;
+    resize: vertical;
+    padding: 9px;
+    border: 1px solid #48484f;
+    border-radius: 4px;
+    background: #121214;
+    color: #fff;
+    font: inherit;
+  }
+}
+
+.selector-estrellas button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #73737b;
+  font-size: 1.6rem;
+  cursor: pointer;
+
+  &.seleccionada {
+    color: #ffc247;
+  }
+}
+
+.error-resena {
+  color: #ff8b91;
+}
+
+.acciones-resena {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  .btn-resena {
+    margin-top: 0;
+  }
+}
+
+.btn-cancelar-resena {
+  min-height: 36px;
+  padding: 0 11px;
+  border: 1px solid #55555d;
+  border-radius: 4px;
+  background: transparent;
+  color: #ddd;
+  font: inherit;
+  cursor: pointer;
+
+  &:hover {
+    border-color: #e50914;
+    color: #fff;
+  }
+}
+
+@media (max-width: 560px) {
+  .perfil-panel {
+    padding: 20px 16px;
+  }
+
+  .campos-dobles {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .guardar-perfil {
+    width: 100%;
+  }
+
+  .menu-perfil {
+    margin-right: -8px;
+    margin-left: -8px;
+  }
+
+  .compra-usuario {
+    grid-template-columns: 76px minmax(0, 1fr);
+    gap: 12px;
+    padding: 10px;
+  }
+
+  .compra-titulo-fila,
+  .compra-pie {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .compra-pie button {
+    width: 100%;
+  }
+}

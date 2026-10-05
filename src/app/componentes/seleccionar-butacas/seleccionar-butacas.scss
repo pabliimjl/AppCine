@@ -1,0 +1,479 @@
+.contenedor-sala {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+  color: #333;
+  font-family: Arial, sans-serif;
+}
+
+h2 {
+  text-align: center;
+  color: #1a1a1a;
+}
+
+.aviso-edad {
+  max-width: 680px;
+  margin: 16px auto 24px;
+  padding: 14px 16px;
+  border-left: 4px solid #f97316;
+  border-radius: 4px;
+  background: #fff7ed;
+  color: #7c2d12;
+
+  p {
+    margin: 5px 0 0;
+    line-height: 1.45;
+  }
+}
+
+/* --- Pantalla --- */
+.pantalla-escenario {
+  perspective: 400px;
+  margin: 30px 0 50px;
+
+  .pantalla {
+    background: linear-gradient(to bottom, #d4d4d4, #f5f5f5);
+    height: 60px;
+    transform: rotateX(-45deg);
+    border-radius: 5px;
+    box-shadow: 0 15px 20px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: #666;
+    letter-spacing: 5px;
+  }
+}
+
+/* --- Leyenda --- */
+.leyenda {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-bottom: 30px;
+  font-size: 0.9rem;
+
+  .item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    .caja {
+      width: 20px;
+      height: 20px;
+      border-radius: 4px;
+      display: inline-block;
+    }
+  }
+}
+
+/* --- Colores de los estados y tipos --- */
+$color-libre: #e2e8f0;
+$color-ocupado: #cbd5e1;
+$color-seleccionado: #3b82f6;
+$color-vip: #fbbf24; // Dorado
+$color-accesible: #38bdf8; // Azul claro
+/* --- Mapa responsive con Scroll Horizontal --- */
+.mapa {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-start;
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: auto;
+  padding-bottom: 15px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.fila {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  width: max-content;
+  min-width: max-content;
+  padding: 0 15px;
+}
+
+.letra-fila {
+  flex: 0 0 20px;
+  width: 20px;
+  text-align: center;
+}
+
+.asientos-contenedor {
+  display: grid;
+  grid-template-columns: repeat(4, 35px) 32px repeat(20, 35px) 32px repeat(4, 35px);
+  gap: 8px;
+  flex: 0 0 auto;
+  width: max-content;
+}
+
+.fila[data-fila="J"] .asiento {
+  justify-self: center;
+}
+
+/* --- Diseño de la Butaca --- */
+.asiento {
+  width: 35px;
+  height: 35px;
+  box-sizing: border-box;
+  border: none;
+  border-radius: 6px 6px 2px 2px; // Forma de silla
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #333;
+
+  /* Estados base */
+  &.libre {
+    background-color: $color-libre;
+    &:hover { background-color: darken($color-libre, 10%); transform: scale(1.1); }
+  }
+
+  &.ocupado {
+    background-color: $color-ocupado;
+    color: transparent; // Oculta el número
+    cursor: not-allowed;
+    position: relative;
+    
+    // Crucecita para indicar ocupado
+    &::after {
+      content: '×';
+      color: #94a3b8;
+      font-size: 1.5rem;
+      position: absolute;
+    }
+  }
+
+  &.seleccionado {
+    background-color: $color-seleccionado !important;
+    color: white;
+    box-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
+    transform: scale(1.1);
+  }
+
+  /* Tipos Especiales (Sobrescriben el color base si están libres) */
+  &.vip.libre {
+    background-color: $color-vip;
+    border: 1px solid darken($color-vip, 15%);
+    border-radius: 8px; // Más grandes/redondeadas
+    box-shadow: inset 0 2px 4px rgba(255,255,255,0.5);
+    &:hover { background-color: lighten($color-vip, 10%); }
+  }
+
+  &.accesible.libre {
+    background-color: $color-accesible;
+    color: white;
+    border-radius: 50%; // Forma distinta para fácil identificación
+    &:hover { background-color: darken($color-accesible, 10%); }
+  }
+
+}
+
+/* --- Barra de Resumen --- */
+.resumen-compra {
+  position: sticky;
+  bottom: 0;
+  background: white;
+  padding: 20px;
+  border-top: 1px solid #eee;
+  box-shadow: 0 -5px 15px rgba(0,0,0,0.05);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 12px 12px 0 0;
+  margin-top: 40px;
+
+  .info {
+    h3 { margin: 0 0 5px 0; font-size: 1.1rem; }
+    p { margin: 0; color: #666; font-size: 0.9rem; }
+    
+    .butacas-lista {
+      margin-top: 8px;
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap;
+
+      .badge {
+        background: #f1f5f9;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-weight: bold;
+        border: 1px solid #cbd5e1;
+      }
+    }
+  }
+
+  .total {
+    text-align: right;
+    
+    h3 { margin: 0 0 10px 0; color: #16a34a; font-size: 1.4rem; }
+    
+    .btn-comprar {
+      background: #10b981;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+      
+      &:hover { background: #059669; }
+    }
+  }
+}
+/* --- Adaptación para Móviles --- */
+@media (max-width: 768px) {
+  .pantalla-escenario {
+    margin: 20px 0 30px; /* Reduce los márgenes superior e inferior */
+    perspective: 300px;  /* Suaviza el efecto 3D para pantallas angostas */
+  }
+
+  .pantalla-escenario .pantalla {
+    height: 40px; /* Reduce la altura de la pantalla */
+    font-size: 0.8rem; /* Texto más pequeño */
+    letter-spacing: 2px; /* Menor separación entre las letras */
+    box-shadow: 0 8px 10px rgba(0,0,0,0.1); /* Sombra más sutil */
+  }
+  
+}
+/* Resumen y botón Siguiente */
+.resumen-inferior {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 40px;
+  padding: 20px 30px;
+  background-color: #1e1e1e; /* Tono oscuro para destacar */
+  border-radius: 12px;
+  border: 1px solid #333;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+
+  .info-total {
+    h3 {
+      margin: 0 0 8px 0;
+      font-size: 1.6rem;
+      color: #ffffff;
+    }
+
+    .estado-seleccion {
+      margin: 0;
+      font-size: 1rem;
+      color: #a0a0a0;
+      transition: color 0.3s ease;
+
+      /* Cambia a verde cuando completas la selección */
+      &.completo {
+        color: #4caf50;
+        font-weight: 600;
+      }
+    }
+  }
+
+  .btn-siguiente {
+    padding: 16px 35px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #ffffff;
+    background-color: #e50914; /* Rojo tipo cine/Netflix */
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover:not([disabled]) {
+      background-color: #ff0a16;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(229, 9, 20, 0.4);
+    }
+
+    /* Estado desactivado */
+    &[disabled] {
+      background-color: #333;
+      color: #666;
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
+    }
+  }
+}
+
+/* Diseño adaptativo para celulares */
+@media (max-width: 600px) {
+  .resumen-inferior {
+    flex-direction: column;
+    gap: 20px;
+    text-align: center;
+    padding: 20px;
+
+    .btn-siguiente {
+      width: 100%;
+    }
+  }
+}
+/* Panel de detalle de la reserva (Película + Tipos de butaca) */
+.detalle-reserva-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 40px;
+  padding: 20px 30px;
+  background-color: #1a1a1a;
+  border-radius: 12px 12px 0 0; /* Bordes redondeados solo arriba */
+  border: 1px solid #333;
+  border-bottom: none; /* Se une con el panel de abajo */
+  box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.2);
+
+  .info-peli-mini {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+
+    img {
+      width: 60px;
+      height: 85px;
+      object-fit: cover;
+      border-radius: 6px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    }
+
+    .textos-peli {
+      h4 {
+        margin: 0 0 5px 0;
+        color: #ffffff;
+        font-size: 1.2rem;
+      }
+      p {
+        margin: 0;
+        color: #a0a0a0;
+        font-size: 0.95rem;
+      }
+    }
+  }
+
+  .info-entradas-mini {
+    text-align: right;
+
+    h4 {
+      margin: 0 0 8px 0;
+      color: #a0a0a0;
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+
+      li {
+        color: #ffffff;
+        font-size: 1.05rem;
+        
+        .cantidad {
+          color: #e50914; /* Tono rojo para la cantidad */
+          font-weight: 700;
+          margin-right: 5px;
+        }
+      }
+    }
+  }
+}
+
+/* Modifica un poco tu .resumen-inferior para que encaje perfectamente con la nueva tarjeta superior */
+.resumen-inferior {
+  border-radius: 0 0 12px 12px; /* Redondea solo abajo para fusionarse con el detalle */
+  margin-top: 0; 
+}
+
+/* Adaptabilidad móvil */
+@media (max-width: 650px) {
+  .detalle-reserva-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+
+    .info-entradas-mini {
+      text-align: left;
+      border-top: 1px solid #333;
+      padding-top: 15px;
+      width: 100%;
+      
+      ul {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 15px;
+      }
+    }
+  }
+}
+
+/* Temporizador Flotante */
+.temporizador-reserva {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background-color: #1a1a1a;
+  color: #e0e0e0;
+  padding: 12px 25px;
+  border-radius: 50px;
+  border: 1px solid #333;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
+  font-size: 1.05rem;
+  font-weight: 500;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  
+  /* Efecto de aparición suave */
+  animation: deslizarArriba 0.4s ease-out;
+
+  .reloj {
+    font-weight: 700;
+    font-family: monospace;
+    font-size: 1.3rem;
+    color: #4caf50; /* Verde por defecto */
+    transition: color 0.3s ease;
+
+    &.peligro {
+      color: #e50914; /* Rojo cine */
+      animation: latido 1s infinite;
+    }
+  }
+}
+
+@keyframes deslizarArriba {
+  from { transform: translateY(50px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes latido {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+@media (max-width: 600px) {
+  .temporizador-reserva {
+    bottom: 10px;
+    right: 10px;
+    left: 10px; /* Ocupa todo el ancho en móvil */
+    justify-content: center;
+  }
+}

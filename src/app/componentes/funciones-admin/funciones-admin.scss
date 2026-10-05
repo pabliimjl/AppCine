@@ -82,6 +82,18 @@
       input[type="datetime-local"] {
         color-scheme: dark;
       }
+
+      .selectores-fecha {
+        display: grid;
+        grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr) minmax(0, 1fr);
+        gap: 6px;
+
+        select {
+          min-width: 0;
+          padding-right: 6px;
+          padding-left: 6px;
+        }
+      }
     }
 
     button[type="submit"] {

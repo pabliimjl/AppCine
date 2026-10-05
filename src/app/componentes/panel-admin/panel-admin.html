@@ -9,7 +9,7 @@
   <p class="alerta exito" *ngIf="mensajeExito()">{{ mensajeExito() }}</p>
 
   <form [formGroup]="peliculaForm" (ngSubmit)="guardarPelicula()" class="admin-form">
-    <h3>Registrar Nueva Película</h3>
+    <h3>{{ peliculaEditandoId() ? 'Editar Película' : 'Registrar Nueva Película' }}</h3>
 
     <div class="grid-2">
       <div class="campo">
@@ -17,8 +17,9 @@
         <input type="text" formControlName="nombre" placeholder="Ej: Batman">
       </div>
       <div class="campo">
-        <label>URL del Póster (Imagen)</label>
-        <input type="text" formControlName="imagen" placeholder="https://...">
+        <label for="poster-pelicula">Póster de la película</label>
+        <input id="poster-pelicula" type="file" accept="image/*" (change)="seleccionarImagen($event)">
+        <small *ngIf="peliculaEditandoId()">Si no seleccionas otro archivo, se conservará el póster actual.</small>
       </div>
     </div>
 
@@ -34,7 +35,20 @@
       </div>
       <div class="campo">
         <label>Fecha de Estreno</label>
-        <input type="date" formControlName="fecha_estreno">
+        <div class="selectores-fecha">
+          <select formControlName="dia_estreno" aria-label="Día de estreno">
+            <option [ngValue]="null" disabled>Día</option>
+            <option *ngFor="let dia of diasDisponibles()" [ngValue]="dia">{{ dia }}</option>
+          </select>
+          <select formControlName="mes_estreno" aria-label="Mes de estreno" (change)="actualizarDiasFecha()">
+            <option [ngValue]="null" disabled>Mes</option>
+            <option *ngFor="let mes of mesesEstreno; let i = index" [ngValue]="i + 1">{{ mes }}</option>
+          </select>
+          <select formControlName="anio_estreno" aria-label="Año de estreno" (change)="actualizarDiasFecha()">
+            <option [ngValue]="null" disabled>Año</option>
+            <option *ngFor="let anio of aniosEstreno" [ngValue]="anio">{{ anio }}</option>
+          </select>
+        </div>
       </div>
       <div class="campo">
         <label>Restricción de Edad (+edad o vacío)</label>
@@ -69,9 +83,14 @@
       </div>
     </div>
 
-    <button type="submit" [disabled]="cargando()">
-      {{ cargando() ? 'Guardando...' : 'Publicar Película' }}
-    </button>
+    <div class="acciones-formulario">
+      <button type="submit" [disabled]="cargando()">
+        {{ cargando() ? 'Guardando...' : (peliculaEditandoId() ? 'Guardar Cambios' : 'Publicar Película') }}
+      </button>
+      <button type="button" class="btn-cancelar" *ngIf="peliculaEditandoId()" [disabled]="cargando()" (click)="cancelarEdicion()">
+        Cancelar
+      </button>
+    </div>
   </form>
 
   <div class="listado-actual">
@@ -80,6 +99,10 @@
       <li *ngFor="let p of peliculas()">
         <span><strong>{{ p.nombre }}</strong> ({{ p.duracion }} min)</span>
         <span class="tags">Formatos: {{ p.formatos?.join(', ') }}</span>
+        <div class="acciones-pelicula">
+          <button type="button" class="btn-editar" [disabled]="cargando()" (click)="editarPelicula(p)">Editar</button>
+          <button type="button" class="btn-eliminar" [disabled]="cargando()" (click)="eliminarPelicula(p)">Eliminar</button>
+        </div>
       </li>
     </ul>
   </div>

@@ -1,0 +1,96 @@
+<section class="candy-container">
+  
+  <!-- Columna Izquierda: Menú -->
+  <div class="menu-seccion">
+    <h2>Agrega algo a tu pedido</h2>
+
+    <!-- Sección de Combos -->
+    <h3 class="categoria-titulo" *ngIf="combos().length > 0">Combos</h3>
+    <div class="grid-candy">
+      <article class="candy-card" *ngFor="let combo of combos()">
+        <img [src]="combo.imagen" [alt]="combo.nombre">
+        <div class="candy-info">
+          <h4>{{ combo.nombre }}</h4>
+          <p class="descripcion">{{ combo.descripcion }}</p>
+          <span class="precio">{{ combo.precio_combo | currency:'ARS':'symbol':'1.0-0' }}</span>
+        </div>
+        <div class="controles-agregar">
+          <button *ngIf="obtenerCantidadEnCarrito(combo.id, 'combo') > 0" (click)="restarDelCarrito(combo.id, 'combo')">-</button>
+          <span *ngIf="obtenerCantidadEnCarrito(combo.id, 'combo') > 0">{{ obtenerCantidadEnCarrito(combo.id, 'combo') }}</span>
+          <button (click)="agregarAlCarrito(combo, 'combo')">
+            {{ obtenerCantidadEnCarrito(combo.id, 'combo') === 0 ? 'Agregar' : '+' }}
+          </button>
+        </div>
+      </article>
+    </div>
+
+    <!-- Sección de Productos Individuales -->
+    <h3 class="categoria-titulo" *ngIf="productos().length > 0">Snacks & Bebidas</h3>
+    <div class="grid-candy">
+      <article class="candy-card" *ngFor="let prod of productos()">
+        <img [src]="prod.imagen" [alt]="prod.nombre">
+        <div class="candy-info">
+          <h4>{{ prod.nombre }}</h4>
+          <!-- Si trajiste el nombre de la categoría del join de Supabase -->
+          <span class="badge-cat" *ngIf="prod.candy_categorias?.nombre">{{ prod.candy_categorias.nombre }}</span>
+          <span class="precio">{{ prod.precio | currency:'ARS':'symbol':'1.0-0' }}</span>
+        </div>
+        <div class="controles-agregar">
+          <button *ngIf="obtenerCantidadEnCarrito(prod.id, 'producto') > 0" (click)="restarDelCarrito(prod.id, 'producto')">-</button>
+          <span *ngIf="obtenerCantidadEnCarrito(prod.id, 'producto') > 0">{{ obtenerCantidadEnCarrito(prod.id, 'producto') }}</span>
+          <button (click)="agregarAlCarrito(prod, 'producto')">
+            {{ obtenerCantidadEnCarrito(prod.id, 'producto') === 0 ? 'Agregar' : '+' }}
+          </button>
+        </div>
+      </article>
+    </div>
+  </div>
+
+  <!-- Columna Derecha: Detalle de Reserva (Ticket) -->
+  <aside class="ticket-resumen">
+    <div class="ticket-contenido">
+      <h3>Tu Pedido</h3>
+      
+      <!-- Detalle Entradas -->
+      <div class="bloque-detalle">
+        <h4>Entradas ({{ butacasSeleccionadas().length }})</h4>
+        <ul class="lista-butacas">
+          <li *ngFor="let b of butacasSeleccionadas()">
+            <span>Fila {{ b.fila }} - Asiento {{ b.numero }} ({{ b.tipo }})</span>
+          </li>
+        </ul>
+        <div class="subtotal">
+          <span>Subtotal Entradas:</span>
+          <span>{{ totalEntradas() | currency:'ARS':'symbol':'1.0-0' }}</span>
+        </div>
+      </div>
+
+      <!-- Detalle Candy -->
+      <div class="bloque-detalle" *ngIf="carrito().length > 0">
+        <h4>Candy Bar</h4>
+        <ul class="lista-candy">
+          <li *ngFor="let item of carrito()">
+            <span>{{ item.cantidad }}x {{ item.nombre }}</span>
+            <span>{{ (item.precio * item.cantidad) | currency:'ARS':'symbol':'1.0-0' }}</span>
+          </li>
+        </ul>
+        <div class="subtotal">
+          <span>Subtotal Candy:</span>
+          <span>{{ totalCandy() | currency:'ARS':'symbol':'1.0-0' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Barra Final Fija -->
+    <div class="barra-final">
+      <div class="total-destacado">
+        <span>Total:</span>
+        <span>{{ totalFinal() | currency:'ARS':'symbol':'1.0-0' }}</span>
+      </div>
+      <button class="btn-pagar" (click)="continuarAlPago()">
+        Ir a Pagar
+      </button>
+    </div>
+  </aside>
+
+</section>

@@ -23,11 +23,21 @@ export class FuncionesAdminComponent implements OnInit {
   mensajeError = signal<string | null>(null);
   mensajeExito = signal<string | null>(null);
   cargando = signal<boolean>(false);
+  readonly mesesInicio = [
+    'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+    'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+  ];
+  readonly aniosInicio = Array.from(
+    { length: new Date().getFullYear() + 21 - 1900 },
+    (_, index) => new Date().getFullYear() + 20 - index
+  );
 
   funcionForm: FormGroup = this.fb.group({
     pelicula_id: ['', Validators.required],
     hora_inicio: ['18:00', Validators.required],
-    fecha_inicio_recurrencia: ['', Validators.required],
+    dia_inicio: [null, Validators.required],
+    mes_inicio: [null, Validators.required],
+    anio_inicio: [null, Validators.required],
     semanas_duracion: [4, [Validators.required, Validators.min(1)]],
     dias_semana: this.fb.group({
       0: [false], 
@@ -58,6 +68,11 @@ export class FuncionesAdminComponent implements OnInit {
   }
 
   async programarFuncionesRecurrentes() {
+    if (!this.fechaInicioValida()) {
+      this.mensajeError.set('Selecciona un día, mes y año válidos para iniciar las funciones.');
+      return;
+    }
+
     if (this.funcionForm.invalid) {
       this.mensajeError.set('Por favor, completa todos los campos correctamente.');
       return;
@@ -67,7 +82,16 @@ export class FuncionesAdminComponent implements OnInit {
     this.mensajeError.set(null);
     this.mensajeExito.set(null);
 
-    const { pelicula_id, hora_inicio, fecha_inicio_recurrencia, semanas_duracion, dias_semana } = this.funcionForm.value;
+    const {
+      pelicula_id,
+      hora_inicio,
+      dia_inicio,
+      mes_inicio,
+      anio_inicio,
+      semanas_duracion,
+      dias_semana
+    } = this.funcionForm.value;
+    const fecha_inicio_recurrencia = `${anio_inicio}-${String(mes_inicio).padStart(2, '0')}-${String(dia_inicio).padStart(2, '0')}`;
 
     const pelicula = this.peliculas().find(p => p.id === pelicula_id);
     if (!pelicula) {
@@ -130,6 +154,34 @@ export class FuncionesAdminComponent implements OnInit {
     this.cargando.set(false);
     this.mensajeExito.set(`¡Proceso finalizado! Se programaron ${funcionesExitosas} funciones con éxito. (${conflictos} omitidas por superposición de sala).`);
     await this.cargarDatos();
+  }
+
+  diasDisponibles(): number[] {
+    const mes = Number(this.funcionForm.get('mes_inicio')?.value);
+    const anio = Number(this.funcionForm.get('anio_inicio')?.value);
+    if (!mes || !anio) return Array.from({ length: 31 }, (_, index) => index + 1);
+
+    const totalDias = new Date(anio, mes, 0).getDate();
+    return Array.from({ length: totalDias }, (_, index) => index + 1);
+  }
+
+  actualizarDiasFecha() {
+    const diaControl = this.funcionForm.get('dia_inicio');
+    const dia = Number(diaControl?.value);
+    if (dia && dia > this.diasDisponibles().length) diaControl?.setValue(null);
+    this.mensajeError.set(null);
+  }
+
+  private fechaInicioValida(): boolean {
+    const dia = Number(this.funcionForm.get('dia_inicio')?.value);
+    const mes = Number(this.funcionForm.get('mes_inicio')?.value);
+    const anio = Number(this.funcionForm.get('anio_inicio')?.value);
+    if (!dia || !mes || !anio) return false;
+
+    const fecha = new Date(anio, mes - 1, dia);
+    return fecha.getFullYear() === anio &&
+      fecha.getMonth() === mes - 1 &&
+      fecha.getDate() === dia;
   }
 
   async encontrarSalaLibre(nuevoInicio: Date, nuevoFin: Date) {

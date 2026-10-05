@@ -1,11 +1,13 @@
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
-import { CommonModule, DatePipe } from '@angular/common';
+import { CommonModule, DatePipe, DOCUMENT, KeyValuePipe } from '@angular/common'; 
 import { SupabaseService } from '../../servicios/supabase';
+import { RouterLink } from '@angular/router';
+import { EstrenosComponent } from '../estrenos/estrenos';
 
 @Component({
   selector: 'app-cartelera',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, KeyValuePipe,RouterLink, EstrenosComponent], 
   providers: [DatePipe], 
   templateUrl: './cartelera.html',
   styleUrls: ['./cartelera.scss']
@@ -13,18 +15,23 @@ import { SupabaseService } from '../../servicios/supabase';
 export class Cartelera implements OnInit {
   funcionesTotales: any[] = [];
   peliculasMostradas: any[] = [];
+  peliculasDelDia: any[] = []; 
   
-  // Array completo de días futuros
   todosLosDias: { fechaFull: Date; etiqueta: string }[] = [];
-  
-  // Los 4 días que se ven en pantalla actualmente
   diasVisibles: { fechaFull: Date; etiqueta: string }[] = [];
   
   diaSeleccionado!: Date; 
-  indiceActual: number = 0; // Controla qué grupo de 4 días estamos viendo
+  indiceActual: number = 0;
 
-  // Inyectamos el detector de cambios
+  terminoBusqueda: string = ''; 
+  mensajePreventa: string | null = null;
+  
+  conteoGeneros: Record<string, number> = {};
+  generosSeleccionados: string[] = []; 
+
   private cdr = inject(ChangeDetectorRef);
+  private document = inject(DOCUMENT);
+  private cargaInicial: Promise<void> = Promise.resolve();
 
   constructor(
     private carteleraService: SupabaseService, 
@@ -34,24 +41,82 @@ export class Cartelera implements OnInit {
   async ngOnInit() {
     this.generarTodosLosDias();
     this.actualizarDiasVisibles();
-    
+
+    this.cargaInicial = this.cargarDatosIniciales();
+    await this.cargaInicial;
+  }
+
+  private async cargarDatosIniciales() {
     try {
-      // Obtenemos todas las funciones futuras desde Supabase
-      this.funcionesTotales = await this.carteleraService.obtenerPeliculasEnCartelera();
+      const [funciones, generos] = await Promise.all([
+        this.carteleraService.obtenerPeliculasEnCartelera(),
+        this.carteleraService.obtenerConteoGenerosFunciones()
+      ]);
+
+      this.funcionesTotales = funciones;
+      this.conteoGeneros = generos; 
+      
       this.filtrarFuncionesPorDia(this.diaSeleccionado);
       
-      // Le avisamos a Angular que los datos llegaron y debe actualizar el HTML ahora mismo
       this.cdr.detectChanges();
     } catch (error) {
       console.error('Error al cargar la cartelera', error);
     }
   }
 
+  toggleGenero(genero: string) {
+    const index = this.generosSeleccionados.indexOf(genero);
+    
+    if (index > -1) {
+      this.generosSeleccionados.splice(index, 1);
+    } else {
+      this.generosSeleccionados.push(genero);
+    }
+    
+    this.aplicarFiltroMultiple();
+  }
+// NUEVO: Captura lo que el usuario escribe
+  actualizarBusqueda(event: Event) {
+    const input = event.target as HTMLInputElement;
+    this.terminoBusqueda = input.value;
+    this.aplicarFiltros();
+  }
+
+  // MODIFICADO: Reemplaza tu método aplicarFiltroMúltiple con este
+  aplicarFiltros() {
+    // 1. Partimos de todas las películas del día
+    let filtradas = [...this.peliculasDelDia];
+
+    // 2. Aplicamos el filtro de géneros si hay alguno seleccionado
+    if (this.generosSeleccionados.length > 0) {
+      filtradas = filtradas.filter(peli => {
+        if (!peli.generos) return false;
+        return peli.generos.some((generoPeli: string) => 
+          this.generosSeleccionados.includes(generoPeli)
+        );
+      });
+    }
+
+    // 3. Aplicamos el filtro de búsqueda por texto
+    if (this.terminoBusqueda.trim() !== '') {
+      const termino = this.terminoBusqueda.toLowerCase().trim();
+      filtradas = filtradas.filter(peli => 
+        peli.nombre.toLowerCase().includes(termino)
+      );
+    }
+
+    // 4. Asignamos el resultado final a la vista
+    this.peliculasMostradas = filtradas;
+  }
+  
+  aplicarFiltroMultiple() {
+    this.aplicarFiltros();
+  }
+
   generarTodosLosDias() {
     const hoy = new Date();
     hoy.setHours(0, 0, 0, 0); 
-
-    // Generamos 15 días hacia adelante
+    
     for (let i = 0; i < 15; i++) { 
       const fechaDia = new Date(hoy);
       fechaDia.setDate(hoy.getDate() + i);
@@ -62,7 +127,6 @@ export class Cartelera implements OnInit {
       } else if (i === 1) {
         etiquetaStr = 'Mañana';
       } else {
-        // Formato ej: "lun. 21". Si no tienes español configurado en Angular, saldrá en inglés ("Mon 21").
         etiquetaStr = this.datePipe.transform(fechaDia, 'EEE d') || ''; 
       }
 
@@ -72,7 +136,6 @@ export class Cartelera implements OnInit {
       });
     }
 
-    // Seleccionar 'Hoy' por defecto
     this.diaSeleccionado = this.todosLosDias[0].fechaFull;
   }
 
@@ -96,7 +159,52 @@ export class Cartelera implements OnInit {
 
   seleccionarDia(dia: Date) {
     this.diaSeleccionado = dia;
+    this.mensajePreventa = null;
     this.filtrarFuncionesPorDia(dia);
+  }
+
+  async seleccionarPrimeraFuncion(peliculaId: string) {
+    await this.cargaInicial;
+
+    const primeraFuncion = this.funcionesTotales
+      .filter(funcion => funcion.peliculas?.id === peliculaId)
+      .sort((a, b) => new Date(a.fecha_hora_inicio).getTime() - new Date(b.fecha_hora_inicio).getTime())[0];
+
+    if (!primeraFuncion) {
+      this.mensajePreventa = 'Todavía no hay funciones programadas para esta película.';
+      return;
+    }
+
+    const fechaFuncion = new Date(primeraFuncion.fecha_hora_inicio);
+    fechaFuncion.setHours(0, 0, 0, 0);
+
+    let indiceFecha = this.todosLosDias.findIndex(dia => this.esMismoDia(dia.fechaFull, fechaFuncion));
+    if (indiceFecha === -1) {
+      const ultimoDia = new Date(this.todosLosDias[this.todosLosDias.length - 1].fechaFull);
+      ultimoDia.setDate(ultimoDia.getDate() + 1);
+
+      while (ultimoDia <= fechaFuncion) {
+        this.todosLosDias.push({
+          fechaFull: new Date(ultimoDia),
+          etiqueta: this.datePipe.transform(ultimoDia, 'EEE d') || ''
+        });
+        ultimoDia.setDate(ultimoDia.getDate() + 1);
+      }
+
+      indiceFecha = this.todosLosDias.findIndex(dia => this.esMismoDia(dia.fechaFull, fechaFuncion));
+    }
+
+    this.indiceActual = Math.min(indiceFecha, Math.max(0, this.todosLosDias.length - 4));
+    this.actualizarDiasVisibles();
+    this.generosSeleccionados = [];
+    this.terminoBusqueda = primeraFuncion.peliculas?.nombre ?? '';
+    this.seleccionarDia(this.todosLosDias[indiceFecha].fechaFull);
+    this.aplicarFiltros();
+    this.cdr.detectChanges();
+    this.document.getElementById(`pelicula-${peliculaId}`)?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'center'
+    });
   }
 
   esMismoDia(fecha1: Date, fecha2: string | Date): boolean {
@@ -110,12 +218,10 @@ export class Cartelera implements OnInit {
   filtrarFuncionesPorDia(diaFiltro: Date) {
     const peliculasMap = new Map();
 
-    // 1. Filtramos las funciones totales para quedarnos solo con las del día seleccionado
     const funcionesDelDia = this.funcionesTotales.filter(funcion => 
       this.esMismoDia(diaFiltro, funcion.fecha_hora_inicio)
     );
 
-    // 2. Agrupamos esas funciones por película
     for (const funcion of funcionesDelDia) {
       const peli = funcion.peliculas;
       
@@ -126,19 +232,25 @@ export class Cartelera implements OnInit {
         });
       }
       
-      // Añadimos la hora de inicio de la función al array de horarios
-      peliculasMap.get(peli.id).horarios.push(funcion.fecha_hora_inicio);
+      peliculasMap.get(peli.id).horarios.push({
+        funcion_id: funcion.id,
+        hora: funcion.fecha_hora_inicio
+      });
     }
 
-    // 3. Ordenamos cronológicamente los horarios dentro de cada película
     Array.from(peliculasMap.values()).forEach(p => {
-       p.horarios.sort((a: string, b: string) => new Date(a).getTime() - new Date(b).getTime());
+       p.horarios.sort((a: any, b: any) => new Date(a.hora).getTime() - new Date(b.hora).getTime());
     });
 
-    // 4. Convertimos a array y ordenamos las películas por estreno (las más nuevas primero)
-    this.peliculasMostradas = Array.from(peliculasMap.values()).sort((a: any, b: any) => {
+    const peliculasOrdenadasPorVentas = Array.from(peliculasMap.values());
+    const masVendidas = peliculasOrdenadasPorVentas.slice(0, 3);
+    const restoPorEstreno = peliculasOrdenadasPorVentas.slice(3).sort((a: any, b: any) => {
       return new Date(b.fecha_estreno).getTime() - new Date(a.fecha_estreno).getTime();
     });
+
+    this.peliculasDelDia = [...masVendidas, ...restoPorEstreno];
+
+    this.aplicarFiltroMultiple();
   }
 
   esEstreno(fechaEstreno: string): boolean {

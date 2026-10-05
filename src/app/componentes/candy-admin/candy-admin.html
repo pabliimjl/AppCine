@@ -31,7 +31,9 @@
     <form [formGroup]="productoForm" (ngSubmit)="guardarProducto()" class="form-panel">
       <input type="text" formControlName="nombre" placeholder="Nombre del Producto">
       <input type="number" formControlName="precio" placeholder="Precio ($)">
-      <input type="text" formControlName="imagen" placeholder="URL de la imagen">
+      <label>Imagen del producto
+        <input type="file" accept="image/*" (change)="seleccionarImagenProducto($event)">
+      </label>
       <select formControlName="categoria_id">
         <option value="" disabled>Seleccione Categoría</option>
         <option *ngFor="let cat of categorias()" [value]="cat.id">{{ cat.nombre }}</option>
@@ -39,7 +41,7 @@
       <input type="number" formControlName="stock" placeholder="Stock disponible">
       
       <div class="botones-form">
-        <button type="submit">{{ productoEditandoId() ? 'Actualizar Producto' : 'Guardar Producto' }}</button>
+        <button type="submit" [disabled]="cargando()">{{ productoEditandoId() ? 'Actualizar Producto' : 'Guardar Producto' }}</button>
         <button type="button" class="btn-cancelar" *ngIf="productoEditandoId()" (click)="cancelarEdicion()">Cancelar</button>
       </div>
     </form>
@@ -66,7 +68,9 @@
       <input type="text" formControlName="nombre" placeholder="Nombre del Combo">
       <textarea formControlName="descripcion" rows="2" placeholder="Descripción..."></textarea>
       <input type="number" formControlName="precio_combo" placeholder="Precio Final del Combo ($)">
-      <input type="text" formControlName="imagen" placeholder="URL de la imagen del combo">
+      <label>Imagen del combo
+        <input type="file" accept="image/*" (change)="seleccionarImagenCombo($event)">
+      </label>
 
       <div class="armador-combo">
         <label>Productos incluidos en el combo:</label>

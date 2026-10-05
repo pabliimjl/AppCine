@@ -88,16 +88,21 @@
         color: #aaaaaa;
       }
 
-      input, textarea {
+      input, textarea, select {
         box-sizing: border-box;
         width: 100%;
-        background-color: rgba(255, 255, 255, 0.05);
+        background-color: #29292d;
         border: 1px solid rgba(255, 255, 255, 0.1);
         color: #ffffff;
         padding: 10px 14px;
         border-radius: 8px;
         outline: none;
         font-size: 0.95rem;
+
+        option {
+          background-color: #ffffff;
+          color: #1c1c1e;
+        }
 
         &:focus {
           border-color: #ff4081;
@@ -108,9 +113,25 @@
       textarea {
         resize: vertical;
       }
+
+      .selectores-fecha {
+        display: grid;
+        grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr) minmax(0, 1fr);
+        gap: 6px;
+
+        select {
+          min-width: 0;
+          padding-right: 6px;
+          padding-left: 6px;
+        }
+      }
     }
 
-    button {
+    .acciones-formulario {
+      display: flex;
+      gap: 10px;
+
+      button {
       margin-top: 10px;
       background-color: #ff4081;
       color: white;
@@ -128,6 +149,11 @@
       &:disabled {
         background-color: #555;
         cursor: not-allowed;
+      }
+
+        &.btn-cancelar {
+          background-color: #555;
+        }
       }
     }
   }
@@ -148,14 +174,41 @@
         background: rgba(255, 255, 255, 0.03);
         padding: 12px;
         border-radius: 8px;
-        display: flex;
-        justify-content: space-between;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(180px, 240px) auto;
         align-items: center;
+        gap: 12px;
         font-size: 0.9rem;
+
+        > span:first-child {
+          min-width: 0;
+        }
 
         .tags {
           color: #ff4081;
           font-size: 0.8rem;
+          overflow-wrap: anywhere;
+        }
+
+        .acciones-pelicula {
+          display: flex;
+          gap: 8px;
+
+          button {
+            border: 0;
+            border-radius: 6px;
+            padding: 8px 10px;
+            color: #fff;
+            cursor: pointer;
+
+            &:disabled {
+              opacity: 0.6;
+              cursor: not-allowed;
+            }
+          }
+
+          .btn-editar { background: #3478c8; }
+          .btn-eliminar { background: #c93652; }
         }
       }
     }
@@ -187,9 +240,12 @@
 
     .listado-actual {
       ul li {
+        display: flex;
         align-items: flex-start;
         flex-direction: column;
         gap: 6px;
+
+        .acciones-pelicula { width: 100%; }
       }
     }
   }

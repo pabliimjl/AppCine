@@ -1,0 +1,185 @@
+<section class="pago-container">
+  
+  <div class="resumen-header">
+    <h2>Finalizar Compra</h2>
+    <div class="total-badge">
+      Total a pagar: <span>{{ totalPagar() | currency:'ARS':'symbol':'1.0-0' }}</span>
+    </div>
+  </div>
+
+  <section class="descuentos-pago" *ngIf="configuracionDescuentos().mayores50Activos || configuracionDescuentos().primeraCompraActiva">
+    <h3>Descuentos disponibles</h3>
+
+    <div class="fecha-nacimiento" *ngIf="configuracionDescuentos().mayores50Activos">
+      <label for="fecha-nacimiento">Fecha de nacimiento</label>
+      <input id="fecha-nacimiento" type="date" [value]="fechaNacimiento()" [max]="fechaMaxima" (input)="actualizarFechaNacimiento($event)">
+      <small>El descuento por edad requiere presentar un documento al retirar las entradas.</small>
+    </div>
+
+    <div class="cupon" *ngIf="configuracionDescuentos().primeraCompraActiva">
+      <label for="codigo-cupon">Cupón de primera compra</label>
+      <div class="fila-cupon">
+        <input id="codigo-cupon" type="text" [value]="codigoCupon()" (input)="actualizarCodigoCupon($event)" placeholder="Ingresa tu código">
+        <button type="button" (click)="aplicarCupon()">Aplicar</button>
+      </div>
+    </div>
+
+    <p class="mensaje-descuento" role="status" *ngIf="mensajeDescuento()">{{ mensajeDescuento() }}</p>
+    <div class="resumen-descuento" *ngIf="importeDescuento() > 0">
+      <span>Subtotal: {{ subtotal() | currency:'ARS':'symbol':'1.0-0' }}</span>
+      <span>Descuento: -{{ importeDescuento() | currency:'ARS':'symbol':'1.0-0' }}</span>
+    </div>
+  </section>
+
+  <!-- ESTADO: SELECCIONANDO MÉTODO -->
+  <div class="seleccion-metodo" *ngIf="estadoPago() === 'pendiente'">
+    
+    <h3>Elige tu medio de pago</h3>
+    <div class="opciones-pago">
+      
+      <!-- Opción Mercado Pago -->
+      <div 
+        class="tarjeta-opcion mp" 
+        [class.activa]="metodoPago() === 'mp'"
+        (click)="seleccionarMetodo('mp')">
+        <div class="icono-mp">QR</div>
+        <h4>Mercado Pago</h4>
+      </div>
+
+      <!-- Opción Tarjeta -->
+      <div 
+        class="tarjeta-opcion credito" 
+        [class.activa]="metodoPago() === 'tarjeta'"
+        (click)="seleccionarMetodo('tarjeta')">
+        <div class="icono-tarjeta">💳</div>
+        <h4>Tarjeta de Crédito / Débito</h4>
+      </div>
+
+      <div
+        class="tarjeta-opcion creditos"
+        *ngIf="usuarioAutenticado()"
+        [class.activa]="metodoPago() === 'creditos'"
+        (click)="seleccionarMetodo('creditos')">
+        <div class="icono-creditos">CR</div>
+        <h4>Mis créditos</h4>
+        <p>{{ saldoCreditos() | number:'1.0-2' }} disponibles</p>
+      </div>
+
+    </div>
+
+    <section class="aporte-creditos" *ngIf="combinacionDisponible() && (metodoPago() === 'mp' || metodoPago() === 'tarjeta')">
+      <label class="usar-creditos-control">
+        <input type="checkbox" [checked]="usarCreditosParciales()" (change)="cambiarUsoCreditos($event)">
+        <span>Usar mis créditos disponibles ({{ saldoCreditos() | number:'1.0-2' }})</span>
+      </label>
+      <div class="desglose-combinado" *ngIf="usarCreditosParciales()">
+        <span>Con créditos: {{ creditosAplicados() | number:'1.0-2' }}</span>
+        <strong>Restante con {{ metodoPago() === 'mp' ? 'Mercado Pago' : 'tarjeta' }}: {{ importeMedioExterno() | currency:'ARS':'symbol':'1.0-2' }}</strong>
+      </div>
+    </section>
+
+    <p class="error-pago" role="alert" *ngIf="mensajeErrorPago()">{{ mensajeErrorPago() }}</p>
+
+    <!-- FLUJO 1: MERCADO PAGO -->
+    <div class="flujo-mp" *ngIf="metodoPago() === 'mp'">
+      <div class="qr-box">
+        <!-- Imagen ficticia de QR -->
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=FicticioMP&color=009ee3" alt="QR Mercado Pago">
+      </div>
+      <p>Escanea este código con tu app de Mercado Pago.</p>
+      <button class="btn-pagar mp-btn" (click)="iniciarPagoMercadoPago()">
+        Simular pago de {{ importeMedioExterno() | currency:'ARS':'symbol':'1.0-2' }}
+      </button>
+    </div>
+
+    <!-- FLUJO 2: TARJETA -->
+    <div class="flujo-tarjeta" *ngIf="metodoPago() === 'tarjeta'">
+      
+      <!-- [formGroup] enlaza el HTML con la lógica de ReactiveForms -->
+      <form [formGroup]="tarjetaForm" (ngSubmit)="procesarPagoTarjeta()">
+        
+        <div class="form-grupo">
+          <label>Número de Tarjeta</label>
+          <div class="input-con-icono">
+            <input 
+              type="text" 
+              formControlName="numero" 
+              placeholder="0000 0000 0000 0000"
+              maxlength="19"
+              (input)="formatearNumeroTarjeta($event)">
+            
+            <!-- Icono dinámico según la marca detectada -->
+            <span class="marca-tarjeta" [ngClass]="tipoTarjeta()">
+              {{ tipoTarjeta() === 'desconocida' ? '💳' : tipoTarjeta() | uppercase }}
+            </span>
+          </div>
+          <small class="error" *ngIf="tarjetaForm.get('numero')?.touched && tarjetaForm.get('numero')?.invalid">
+            Número de tarjeta inválido.
+          </small>
+        </div>
+
+        <div class="form-grupo">
+          <label>Nombre del Titular</label>
+          <input type="text" formControlName="nombre" placeholder="COMO FIGURA EN LA TARJETA">
+          <small class="error" *ngIf="tarjetaForm.get('nombre')?.touched && tarjetaForm.get('nombre')?.invalid">
+            El nombre es obligatorio.
+          </small>
+        </div>
+
+        <div class="fila-doble">
+          <div class="form-grupo">
+            <label>Vencimiento</label>
+            <input type="text" formControlName="vencimiento" placeholder="MM/YY" maxlength="5" (input)="formatearVencimiento($event)">
+            <div *ngIf="tarjetaForm.get('vencimiento')?.touched && tarjetaForm.get('vencimiento')?.invalid">
+              <small class="error" *ngIf="tarjetaForm.get('vencimiento')?.hasError('required')">
+                Requerido.
+              </small>
+              <small class="error" *ngIf="tarjetaForm.get('vencimiento')?.hasError('pattern')">
+                Formato inválido.
+              </small>
+              <small class="error" *ngIf="tarjetaForm.get('vencimiento')?.hasError('tarjetaVencida')">
+                La tarjeta está vencida.
+              </small>
+            </div>
+          </div>
+
+          <div class="form-grupo">
+            <label>CVV</label>
+            <input type="password" formControlName="cvv" placeholder="123" maxlength="4">
+            <small class="error" *ngIf="tarjetaForm.get('cvv')?.touched && tarjetaForm.get('cvv')?.invalid">
+              Requerido.
+            </small>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-pagar tarjeta-btn">
+          Pagar {{ (usarCreditosParciales() ? importeMedioExterno() : totalPagar()) | currency:'ARS':'symbol':'1.0-2' }}
+        </button>
+
+      </form>
+    </div>
+
+    <div class="flujo-creditos" *ngIf="metodoPago() === 'creditos'">
+      <p>El importe se descontará de tu saldo de créditos. 1 peso equivale a 1 crédito.</p>
+      <p class="saldo-pago">Saldo: <strong>{{ saldoCreditos() | number:'1.0-2' }} créditos</strong></p>
+      <p class="faltan-creditos" *ngIf="saldoCreditos() < totalPagar()">
+        Te faltan {{ totalPagar() - saldoCreditos() | number:'1.0-2' }} créditos. Elegí tarjeta o Mercado Pago y activá “Usar mis créditos disponibles” para combinar.
+      </p>
+      <button
+        type="button"
+        class="btn-pagar creditos-btn"
+        [disabled]="saldoCreditos() < totalPagar()"
+        (click)="procesarPagoCreditos()">
+        Pagar {{ totalPagar() | number:'1.0-2' }} créditos
+      </button>
+    </div>
+  </div>
+
+  <!-- ESTADO: PROCESANDO (Pantalla de Carga) -->
+  <div class="pantalla-carga" *ngIf="estadoPago() === 'procesando'">
+    <div class="spinner"></div>
+    <h3>Procesando tu pago...</h3>
+    <p>Por favor, no cierres esta ventana.</p>
+  </div>
+
+</section>

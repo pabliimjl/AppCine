@@ -26,7 +26,20 @@
       </div>
       <div class="campo">
         <label>Fecha de Inicio (Desde cuándo)</label>
-        <input type="date" formControlName="fecha_inicio_recurrencia">
+        <div class="selectores-fecha">
+          <select formControlName="dia_inicio" aria-label="Día de inicio">
+            <option [ngValue]="null" disabled>Día</option>
+            <option *ngFor="let dia of diasDisponibles()" [ngValue]="dia">{{ dia }}</option>
+          </select>
+          <select formControlName="mes_inicio" aria-label="Mes de inicio" (change)="actualizarDiasFecha()">
+            <option [ngValue]="null" disabled>Mes</option>
+            <option *ngFor="let mes of mesesInicio; let i = index" [ngValue]="i + 1">{{ mes }}</option>
+          </select>
+          <select formControlName="anio_inicio" aria-label="Año de inicio" (change)="actualizarDiasFecha()">
+            <option [ngValue]="null" disabled>Año</option>
+            <option *ngFor="let anio of aniosInicio" [ngValue]="anio">{{ anio }}</option>
+          </select>
+        </div>
       </div>
     </div>
 

@@ -1,0 +1,108 @@
+/* Contenedor del Carrusel Horizontal */
+.estrenos-carousel {
+  display: flex;
+  gap: 1rem;
+  padding: 0.5rem 0 1rem 0; /* Espacio para la sombra y la barra de scroll */
+  overflow-x: auto;
+  overflow-y: hidden;
+  height: 270px; /* 250px de tarjeta + 20px de padding/scroll */
+  scroll-snap-type: x mandatory; /* Hace que el deslizamiento frene exactamente en cada tarjeta */
+  scroll-behavior: smooth;
+  
+  /* Estilo de la barra de desplazamiento (Firefox) */
+  scrollbar-width: thin;
+  scrollbar-color: #e50914 #1a1a1a;
+}
+
+/* Estilo de la barra de desplazamiento (Chrome, Edge, Safari) */
+.estrenos-carousel::-webkit-scrollbar {
+  height: 8px;
+}
+.estrenos-carousel::-webkit-scrollbar-track {
+  background: #1a1a1a;
+  border-radius: 4px;
+}
+.estrenos-carousel::-webkit-scrollbar-thumb {
+  background: #e50914;
+  border-radius: 4px;
+}
+
+/* Tarjeta individual */
+.movie-card {
+  flex: 0 0 145px; /* Define un ancho fijo para las tarjetas (no se achican ni se agrandan) */
+  height: 250px; /* Altura estricta solicitada */
+  background-color: #1e1e1e;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  color: #ffffff;
+  scroll-snap-align: start; /* Punto de anclaje al deslizar */
+  transition: transform 0.2s ease;
+}
+
+/* Efecto hover tipo zoom sutil */
+.movie-card:hover {
+  transform: scale(1.03);
+}
+
+/* Imagen del póster adaptada a la tarjeta pequeña */
+.movie-card img {
+  width: 100%;
+  height: 135px; /* Ocupa un poco más de la mitad de la tarjeta */
+  object-fit: cover;
+  object-position: center top; /* Evita cortar cabezas en los pósters */
+  border-bottom: 2px solid #e50914;
+}
+
+/* Textos compactos */
+.movie-card h3 {
+  margin: 0.4rem 0.5rem 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.movie-card p {
+  margin: 0.2rem 0.5rem;
+  font-size: 0.75rem;
+  color: #a0a0a0;
+}
+
+/* Botones adaptados al nuevo tamaño */
+.btn-preventa, 
+.btn-disabled {
+  margin: auto 0.5rem 0.5rem; /* El "auto" empuja el botón hasta abajo */
+  padding: 0.4rem 0;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  text-align: center;
+  width: calc(100% - 1rem);
+  transition: background-color 0.2s ease;
+}
+
+.btn-preventa {
+  background-color: #e50914;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.btn-preventa:hover {
+  background-color: #ff1523;
+}
+
+.btn-preventa:active {
+  transform: scale(0.95);
+}
+
+.btn-disabled {
+  background-color: #2a2a2a;
+  color: #777777;
+  cursor: not-allowed;
+  border: 1px solid #333;
+}

@@ -1,0 +1,73 @@
+<!-- Leemos el signal y lo guardamos temporalmente en 'df' para más comodidad -->
+<section class="reserva-container" *ngIf="detalleFuncion() as df">
+  
+  <div class="info-pelicula">
+    <img [src]="df.peliculas.imagen" [alt]="df.peliculas.nombre">
+    <div>
+      <h2>{{ df.peliculas.nombre }}</h2>
+      <p><strong>Sala:</strong> {{ df.salas.nombre }}</p>
+      <p><strong>Horario:</strong> {{ df.fecha_hora_inicio | date:'dd/MM/yyyy HH:mm' }}</p>
+      <p class="badge-preventa" *ngIf="esPreventa()">Precio de preventa aplicado</p>
+    </div>
+  </div>
+
+  <div class="seleccion-entradas">
+    <h3>Selecciona tus entradas</h3>
+
+    <!-- General -->
+    <div class="tipo-entrada">
+      <div class="detalle-tipo">
+        <span>General</span>
+        <span class="precio">{{ precioBase() | currency:'ARS' }}</span>
+      </div>
+      <div class="controles">
+        <button (click)="cambiarCantidad('general', -1)">-</button>
+        <span>{{ entradas().general }}</span>
+        <button (click)="cambiarCantidad('general', 1)">+</button>
+      </div>
+    </div>
+
+    <!-- Discapacitado -->
+    <div class="tipo-entrada">
+      <div class="detalle-tipo">
+        <span>Discapacitado (50% desc)</span>
+        <span class="precio">{{ precioDiscapacitado() | currency:'ARS' }}</span>
+      </div>
+      <div class="controles">
+        <button (click)="cambiarCantidad('discapacitado', -1)">-</button>
+        <span>{{ entradas().discapacitado }}</span>
+        <button (click)="cambiarCantidad('discapacitado', 1)">+</button>
+      </div>
+    </div>
+
+    <!-- VIP -->
+    <div class="tipo-entrada">
+      <div class="detalle-tipo">
+        <span>VIP</span>
+        <span class="precio">{{ precioVip() | currency:'ARS' }}</span>
+      </div>
+      <div class="controles">
+        <button (click)="cambiarCantidad('vip', -1)">-</button>
+        <span>{{ entradas().vip }}</span>
+        <button (click)="cambiarCantidad('vip', 1)">+</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="resumen-compra">
+    <h3>Total: {{ totalPagar() | currency:'ARS' }}</h3>
+    <button 
+      class="btn-confirmar" 
+      [disabled]="totalEntradas() === 0"
+      (click)="confirmarCompra()">
+      
+      Continuar a seleccion de butacas
+    </button>
+  </div>
+
+</section>
+
+<!-- Leemos el estado de carga -->
+<div *ngIf="!detalleFuncion()" class="loading">
+  Cargando información de la función...
+</div>

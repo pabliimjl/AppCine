@@ -3,87 +3,64 @@
   justify-content: space-between;
   align-items: center;
   padding: 1rem 2rem;
-  background-color: #0f1014; /* Mantiene la estética oscura */
+  background-color: #0f1014;
   border-bottom: 1px solid #1a1c23;
 
-  .header-left {
+  .header-left,
+  .header-right {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    color: #a3a3a3;
-    font-size: 0.9rem;
+  }
+
+  .usuario-logueado,
+  .invitado-bloque {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .btn-cartelera,
+  .enlace-perfil,
+  .btn-login,
+  .btn-cerrar,
+  .btn-admin,
+  .btn-validar-qr {
+    display: inline-flex;
+    align-items: center;
+    min-height: 40px;
+    padding: 0 0.5rem;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: #fff;
+    font: inherit;
+    font-weight: 700;
+    text-decoration: none;
+    text-transform: uppercase;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: #ff6870;
+    }
+
+    &.activo {
+      color: #ff6870;
+      text-decoration: underline;
+      text-decoration-color: #e50914;
+      text-underline-offset: 5px;
+    }
+  }
+
+  .saludo {
+    color: #e5e5e5;
     font-weight: 500;
   }
 
-  .header-right {
-    .btn-login {
-      background-color: #ffffff;
-      color: #0f1014;
-      border: none;
-      padding: 0.5rem 1.25rem;
-      border-radius: 6px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background-color 0.2s, transform 0.1s;
-
-      &:hover {
-        background-color: #e5e5e5;
-        transform: translateY(-1px);
-      }
-      &:active {
-        transform: translateY(1px);
-      }
-    }
-  }
-  .header-right {
-    display: flex;
-    align-items: center;
-
-    .usuario-logueado, .invitado-bloque {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    .saludo {
-      color: #e5e5e5;
-      font-weight: 500;
-    }
-
-    .enlace-perfil {
-      color: #d4d4d8;
-      font-weight: 600;
-      text-decoration: none;
-      transition: color 0.2s ease;
-
-      &:hover,
-      &.activo {
-        color: #fff;
-        text-decoration: underline;
-        text-underline-offset: 4px;
-      }
-    }
-
-    .texto-invitado {
-      color: #a3a3a3;
-      font-style: italic;
-      font-size: 0.9rem;
-    }
-
-    .btn-cerrar {
-      background: transparent;
-      color: #e50914;
-      border: 1px solid #e50914;
-      padding: 0.4rem 1rem;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: all 0.2s;
-
-      &:hover {
-        background: #e50914;
-        color: white;
-      }
-    }
+  .texto-invitado {
+    color: #a3a3a3;
+    font-size: 0.9rem;
   }
 }
 
@@ -93,6 +70,8 @@
 
     .usuario-logueado,
     .invitado-bloque {
+      flex-wrap: wrap;
+      justify-content: flex-end;
       gap: 0.65rem;
     }
 

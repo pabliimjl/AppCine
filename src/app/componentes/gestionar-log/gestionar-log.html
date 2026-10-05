@@ -1,0 +1,44 @@
+<main class="log-contenedor">
+  <a routerLink="/admin" class="volver">Volver al panel</a>
+  <header class="encabezado-log">
+    <div>
+      <h2>Registro de auditoría</h2>
+      <p>Acciones registradas durante los últimos {{ periodoDias() }} días.</p>
+    </div>
+    <button type="button" class="actualizar" (click)="cargarAuditoria()" [disabled]="cargandoAuditoria()" aria-label="Actualizar registro" title="Actualizar registro">↻</button>
+  </header>
+
+  <form class="filtro-periodo" (ngSubmit)="aplicarPeriodo()">
+    <label for="periodo-dias">Periodo en días</label>
+    <input id="periodo-dias" type="number" name="periodoDias" min="1" max="3650" step="1" required [(ngModel)]="diasSeleccionados">
+    <button type="submit" [disabled]="cargandoAuditoria()">Aplicar</button>
+  </form>
+
+  <p class="estado-log error" role="alert" *ngIf="errorAuditoria()">{{ errorAuditoria() }}</p>
+  <p class="estado-log" role="status" *ngIf="cargandoAuditoria()">Cargando registros...</p>
+  <p class="estado-log" *ngIf="!cargandoAuditoria() && !errorAuditoria() && eventosAuditoria().length === 0">No hay acciones registradas en este periodo.</p>
+  <p class="cantidad-registros" *ngIf="eventosAuditoria().length > 0">{{ eventosAuditoria().length }} registros</p>
+
+  <div class="tabla-log-contenedor" *ngIf="eventosAuditoria().length > 0">
+    <table>
+      <thead>
+        <tr>
+          <th scope="col">Fecha y hora</th>
+          <th scope="col">Usuario</th>
+          <th scope="col">Acción</th>
+          <th scope="col">Entidad</th>
+          <th scope="col">Detalle</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let evento of eventosAuditoria()">
+          <td>{{ evento.ocurrido_en | date:'dd/MM/yyyy HH:mm:ss' }}</td>
+          <td>{{ evento.usuario_nombre }}</td>
+          <td><span class="accion-log" [class]="'accion-log ' + evento.accion.toLowerCase()">{{ evento.accion }}</span></td>
+          <td>{{ evento.entidad }}</td>
+          <td>{{ evento.descripcion }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</main>

@@ -15,7 +15,7 @@
       <label>Película</label>
       <select formControlName="pelicula_id">
         <option value="" disabled>Seleccione una película</option>
-        <option *ngFor="let p of peliculas()" [value]="p.id">{{ p.nombre }} ({{ p.duracion }} min)</option>
+        <option *ngFor="let p of peliculas()" [value]="p.id">{{ p.nombre | uppercase }} ({{ p.duracion }} min)</option>
       </select>
     </div>
 
@@ -72,7 +72,7 @@
       <li *ngFor="let f of funciones()">
         <div class="info-funcion">
           <div>
-            <strong>{{ f.peliculas?.nombre }}</strong> - <span class="sala-badge">{{ f.salas?.nombre }}</span>
+            <strong>{{ f.peliculas?.nombre | uppercase }}</strong> - <span class="sala-badge">{{ f.salas?.nombre }}</span>
           </div>
           <button type="button" class="btn-eliminar-funcion" (click)="eliminarFuncion(f.id)" title="Eliminar función">×</button>
         </div>

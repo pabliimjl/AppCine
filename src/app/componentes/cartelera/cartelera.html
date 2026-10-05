@@ -65,12 +65,12 @@
     <article class="pelicula-card" *ngFor="let peli of peliculasMostradas" [id]="'pelicula-' + peli.id">
       
       <div class="poster-wrapper">
-        <img [src]="peli.imagen" [alt]="peli.nombre" class="poster-img">
+        <img [src]="peli.imagen" [alt]="peli.nombre | uppercase" class="poster-img">
         <span class="badge-estreno" *ngIf="esEstreno(peli.fecha_estreno)">NUEVO</span>
       </div>
       
       <div class="pelicula-info">
-        <h3 class="pelicula-titulo">{{ peli.nombre }}</h3>
+        <h3 class="pelicula-titulo">{{ peli.nombre | uppercase }}</h3>
         <p class="pelicula-genero">{{ peli.generos?.join(', ') }}</p>
         
         <div class="horarios-list">

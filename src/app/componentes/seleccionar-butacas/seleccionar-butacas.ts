@@ -239,4 +239,22 @@ export class SeleccionButacasComponent implements OnInit, OnDestroy {
       }
     });
   }
+
+  async volverAReserva() {
+    const idFuncion = this.funcionId();
+    if (!idFuncion) return;
+
+    await this.supabaseService.liberarButacasDeSesion(idFuncion, this.sesionId);
+    this.router.navigate(['/reserva', idFuncion], {
+      state: { entradasSeleccionadas: this.entradasAComprar() }
+    });
+  }
+
+  async cancelarCompra() {
+    const idFuncion = this.funcionId();
+    if (idFuncion) {
+      await this.supabaseService.liberarButacasDeSesion(idFuncion, this.sesionId);
+    }
+    this.router.navigate(['/']);
+  }
 }

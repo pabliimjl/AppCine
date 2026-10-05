@@ -49,7 +49,7 @@
     <div class="seccion-control">
       <div class="info-bloque">
         <h4>🎬 Entrada al Cine</h4>
-        <p><strong>Película:</strong> {{ reserva().pelicula?.nombre }}</p>
+        <p><strong>Película:</strong> {{ reserva().pelicula?.nombre | uppercase }}</p>
         <p><strong>Butacas ({{ reserva().butacas?.length || 0 }}):</strong></p>
         <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; margin-bottom: 10px;">
         <span *ngFor="let butaca of reserva().butacas" 

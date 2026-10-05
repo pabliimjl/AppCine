@@ -1,4 +1,8 @@
 <div class="contenedor-sala">
+  <nav class="acciones-compra" aria-label="Navegación de compra">
+    <button type="button" class="btn-volver" (click)="volverAReserva()">← Volver</button>
+    <button type="button" class="btn-cancelar" (click)="cancelarCompra()">Cancelar compra</button>
+  </nav>
   <h2>Selecciona tus butacas</h2>
 
   <div class="aviso-edad" role="note" *ngIf="esCompraAnonima() && detalleFuncion()?.peliculas?.restriccion_edad as edad">
@@ -53,9 +57,9 @@
   <div class="detalle-reserva-info" *ngIf="detalleFuncion() as df">
     
     <div class="info-peli-mini">
-      <img [src]="df.peliculas.imagen" [alt]="df.peliculas.nombre">
+      <img [src]="df.peliculas.imagen" [alt]="df.peliculas.nombre | uppercase">
       <div class="textos-peli">
-        <h4>{{ df.peliculas.nombre }}</h4>
+        <h4>{{ df.peliculas.nombre | uppercase }}</h4>
         <p>{{ df.fecha_hora_inicio | date:'dd/MM/yyyy HH:mm' }} | {{ df.salas.nombre }}</p>
       </div>
     </div>

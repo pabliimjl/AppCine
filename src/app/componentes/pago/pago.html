@@ -1,4 +1,10 @@
 <section class="pago-container">
+  <nav class="acciones-compra"
+    *ngIf="estadoPago() === 'pendiente'"
+    aria-label="Navegación de compra">
+    <button type="button" class="btn-volver" (click)="volverACandy()">← Volver</button>
+    <button type="button" class="btn-cancelar" (click)="cancelarCompra()">Cancelar compra</button>
+  </nav>
   
   <div class="resumen-header">
     <h2>Finalizar Compra</h2>

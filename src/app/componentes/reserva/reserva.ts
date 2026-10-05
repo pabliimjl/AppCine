@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
-import { CommonModule, DatePipe, CurrencyPipe } from '@angular/common';
+import { CommonModule, DatePipe, CurrencyPipe, Location } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { SupabaseService } from '../../servicios/supabase';
 
@@ -16,9 +16,15 @@ export class ReservaComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private carteleraService = inject(SupabaseService);
   private router = inject(Router); 
+  private location = inject(Location);
+  private puedeVolverAlOrigen = false;
 
   funcionId = signal<string | null>(null);
   detalleFuncion = signal<any>(null);
+  readonly estrellas = [1, 2, 3, 4, 5];
+  calificacionRedondeada = computed(() => Math.round(
+    Number(this.detalleFuncion()?.peliculas?.calificacion_promedio ?? 0)
+  ));
   
   entradas = signal({
     general: 0,
@@ -46,6 +52,13 @@ export class ReservaComponent implements OnInit {
   });
   precioDiscapacitado = computed(() => this.precioBase() * 0.5);
   precioVip = computed(() => this.precioBase() * 1.5);
+
+  constructor() {
+    const navegacion = this.router.getCurrentNavigation();
+    this.puedeVolverAlOrigen = Boolean(navegacion?.previousNavigation);
+    const entradas = navegacion?.extras.state?.['entradasSeleccionadas'];
+    if (entradas) this.entradas.set(entradas);
+  }
 
   totalEntradas = computed(() => {
     const e = this.entradas();
@@ -91,5 +104,17 @@ export class ReservaComponent implements OnInit {
         totalPagar: this.totalPagar() 
       }
     });
+  }
+
+  volver() {
+    if (this.puedeVolverAlOrigen) {
+      this.location.back();
+    } else {
+      this.router.navigate(['/']);
+    }
+  }
+
+  cancelarCompra() {
+    this.router.navigate(['/']);
   }
 }

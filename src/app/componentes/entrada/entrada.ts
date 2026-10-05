@@ -25,6 +25,8 @@ export class EntradaComponent implements OnInit {
   esCompraAnonima = signal(false);
   emailUsuario = signal<string>('');
   emailEnviado = signal<boolean>(false);
+  enviandoEmail = signal(false);
+  errorEmail = signal<string | null>(null);
 
   constructor() {
     const nav = this.router.getCurrentNavigation();
@@ -58,136 +60,19 @@ export class EntradaComponent implements OnInit {
   }
 
   async enviarTicketPorEmail() {
+    if (this.enviandoEmail() || this.emailEnviado()) return;
 
-    const detallesReserva = this.detallesReserva();
-    
-    const destinatario = this.emailUsuario();
-    const ticket = this.datosTicket();
-    const pelicula = detallesReserva?.pelicula.nombre;
-    const urlImagenPeli = detallesReserva?.pelicula.imagen;
-    const fechaFuncion = new Date(detallesReserva?.fechaHoraFuncion );
-    const fechaFormateada = fechaFuncion ? new Intl.DateTimeFormat('es-AR', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    }).format(fechaFuncion) : '';
-
-    const horaFormateada = fechaFuncion ? new Intl.DateTimeFormat('es-AR',{
-      hour:'2-digit',
-      minute:'2-digit',
-      hour12: false
-    }).format(fechaFuncion) : '';
-    
-    
-    
-
+    this.enviandoEmail.set(true);
+    this.errorEmail.set(null);
     try {
-      // 1. Generamos el QR en Base64 asegurando un tamaño limpio
-      const qrBase64DataUrl = await QRCode.toDataURL(this.nroReserva(), {
-        width: 220,
-        margin: 2,
-        color: { dark: '#000000', light: '#ffffff' }
-      });
-      const base64Puro = qrBase64DataUrl.split(',')[1];
-      const urlImagenQR = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${this.nroReserva()}`;
-
-      // 2. Construimos la sección de butacas de forma segura
-      const htmlButacas = ticket?.butacas && ticket.butacas.length > 0
-        ? ticket.butacas.map((b: any) => `<li style="margin-bottom: 6px; font-size: 14px;">🎟️ Fila <strong>${b.fila}</strong> - Asiento <strong>${b.numero}</strong> (${b.tipo})</li>`).join('')
-        : '<li>Sin butacas registradas</li>';
-
-      // 3. Construimos la sección de Candy Bar validando que existan ítems
-      let htmlCandySeccion = '';
-      if (ticket?.itemsCandy && ticket.itemsCandy.length > 0) {
-        const listaCandy = ticket.itemsCandy.map((item: any) => 
-          `<li style="margin-bottom: 6px; font-size: 14px;">🍿 <strong>${item.cantidad}x</strong> ${item.nombre}</li>`
-        ).join('');
-
-        htmlCandySeccion = `
-          <h3 style="border-bottom: 1px solid #ddd; padding-bottom: 5px; margin-top: 25px; color: #333; font-size: 16px;">Candy Bar</h3>
-          <ul style="list-style: none; padding-left: 0; margin: 10px 0;">
-            ${listaCandy}
-          </ul>
-        `;
-      }
-
-      // 4. Estructura HTML optimizada para clientes de correo (usando tablas para máxima compatibilidad)
-      const htmlBody = `
-        <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f4f4f4; padding: 20px; font-family: Arial, sans-serif;">
-          <tr>
-            <td align="center">
-              <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 10px; overflow: hidden; border: 1px solid #ddd; padding: 30px;">
-                <tr>
-                  <td align="center">
-                    <h2 style="color: #e50914; margin-top: 0;">¡Gracias por tu compra!</h2>
-
-                    <p style="color: #555; font-size: 15px;">Ya tenes tus entradas para ver ${pelicula}</p>
-                      <img src="${urlImagenPeli}" alt="${pelicula}" width="180" style="display: block; margin: 0 auto;" />
-                    <p style="color: #555; font-size: 15px;">Te esperamos el ${fechaFormateada} a las ${horaFormateada}</p>
-                    <p style="color: #555; font-size: 15px;">Presenta este código QR en la entrada del cine y en el Candy Bar:</p>
-                    
-                    <!-- Contenedor del QR con dimensiones fijas para evitar distorsiones -->
-                    <div style="margin: 20px 0; background: #ffffff; padding: 10px; display: inline-block; border: 1px solid #eee; border-radius: 8px;">
-                      <img src="${urlImagenQR}" alt="Código QR de Reserva" width="180" height="180" style="display: block; margin: 0 auto;" />
-                    </div>
-
-                    <p style="font-size: 13px; color: #777; margin-bottom: 25px;">
-                      Reserva oficial: <br>
-                      <strong style="color: #333; font-family: monospace; font-size: 15px;">${this.nroReserva()}</strong>
-                    </p>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <h3 style="border-bottom: 1px solid #ddd; padding-bottom: 5px; color: #333; font-size: 16px;">Tus Butacas</h3>
-                    <ul style="list-style: none; padding-left: 0; margin: 10px 0;">
-                      ${htmlButacas}
-                    </ul>
-
-                    ${htmlCandySeccion}
-                  </td>
-                </tr>
-                <tr>
-                  <td align="center" style="padding-top: 30px;">
-                    <p style="color: #888; font-size: 13px; margin: 0;">¡Disfruta la función! 🎬</p>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-        </table>
-      `;
-
-      // 5. Enviamos a Brevo adjuntando también el archivo por si el cliente bloquea imágenes
-      /*const response = await fetch('https://api.brevo.com/v3/smtp/email', {
-        method: 'POST',
-        headers: { 
-          'accept': 'application/json',
-          'api-key': BREVO_API_KEY,
-          'content-type': 'application/json' 
-        },
-        body: JSON.stringify({
-          sender: { name: 'Cine Scalas', email: 'pabloagustinjesus@gmail.com' },
-          to: [ { email: destinatario } ],
-          subject: 'Tus entradas para el cine 🎟️🍿',
-          htmlContent: htmlBody,
-          attachment: [
-            {
-              content: base64Puro,
-              name: 'ticket-qr.png'
-            }
-          ]
-        })
-      });
-
-      if (response.ok) {
-        this.emailEnviado.set(true);
-      } else {
-        const errorData = await response.json();
-        console.error('Error de Brevo:', errorData);
-      }*/
+      const { error } = await this.supabaseService.enviarTicketPorEmail(this.nroReserva());
+      if (error) throw error;
+      this.emailEnviado.set(true);
     } catch (error) {
-      console.error('Error en el proceso del correo:', error);
+      console.error('Error al enviar el ticket:', error);
+      this.errorEmail.set('No se pudo enviar el ticket. Puedes intentarlo nuevamente.');
+    } finally {
+      this.enviandoEmail.set(false);
     }
   }
   volverAlInicio() {
@@ -205,7 +90,7 @@ export class EntradaComponent implements OnInit {
     const ticket = this.datosTicket();
     const detallesReserva = await this.cargarDetallesReserva();
     
-    const pelicula = detallesReserva?.pelicula.nombre || 'Película';
+    const pelicula = (detallesReserva?.pelicula.nombre || 'Película').toLocaleUpperCase('es-AR');
     const fechaFuncion = new Date(detallesReserva?.fechaHoraFuncion);
     
     const fechaFormateada = fechaFuncion ? new Intl.DateTimeFormat('es-AR', {

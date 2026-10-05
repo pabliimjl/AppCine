@@ -66,6 +66,16 @@ export const routes: Routes = [
       { 
         path: 'candy', 
         loadComponent: () => import('./componentes/candy-admin/candy-admin').then(m => m.CandyAdminComponent) 
+      },
+      {
+        path: 'cupones',
+        loadComponent: () => import('./componentes/gestionar-cupones/gestionar-cupones').then(m => m.GestionarCuponesComponent),
+        title: 'Gestionar cupones y descuentos'
+      },
+      {
+        path: 'log',
+        loadComponent: () => import('./componentes/gestionar-log/gestionar-log').then(m => m.GestionarLogComponent),
+        title: 'Gestionar log'
       }   
     ]
   },

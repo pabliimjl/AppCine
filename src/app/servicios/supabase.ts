@@ -30,7 +30,11 @@ export const CONFIGURACION_DESCUENTOS_POR_DEFECTO: ConfiguracionDescuentos = {
 export class SupabaseService {
   private supabase: SupabaseClient;
 
-  private usuarioActual = new BehaviorSubject<{logeado: boolean, nombre: string | null}>({ logeado: false, nombre: null });
+  private usuarioActual = new BehaviorSubject<{ logeado: boolean; nombre: string | null; esAdmin: boolean }>({
+    logeado: false,
+    nombre: null,
+    esAdmin: false
+  });
   public estadoUsuario$ = this.usuarioActual.asObservable();
 
   constructor() {
@@ -46,13 +50,13 @@ export class SupabaseService {
     const { data: { session } } = await this.supabase.auth.getSession();
     if (session && session.user) {
       const perfil = await this.obtenerPerfilUsuario();
-      this.usuarioActual.next({ logeado: true, nombre: perfil?.nombre || 'Usuario' });
+      this.usuarioActual.next({ logeado: true, nombre: perfil?.nombre || 'Usuario', esAdmin: perfil?.rol === 'admin' });
     }
   }
 
   async cerrarSesion() {
     await this.supabase.auth.signOut();
-    this.usuarioActual.next({ logeado: false, nombre: null });
+    this.usuarioActual.next({ logeado: false, nombre: null, esAdmin: false });
   }
 
   async obtenerPeliculas() {
@@ -80,7 +84,7 @@ export class SupabaseService {
     // Si el login es exitoso, actualizamos el estado reactivo
     if (respuesta.data.session) {
       const perfil = await this.obtenerPerfilUsuario();
-      this.usuarioActual.next({ logeado: true, nombre: perfil?.nombre || 'Usuario' });
+      this.usuarioActual.next({ logeado: true, nombre: perfil?.nombre || 'Usuario', esAdmin: perfil?.rol === 'admin' });
     }
 
     return respuesta;
@@ -109,7 +113,7 @@ export class SupabaseService {
       if (dbError) return { error: dbError };
 
       // Si el registro es exitoso y el perfil se creó, actualizamos el estado
-      this.usuarioActual.next({ logeado: true, nombre: usuarioData.nombre });
+      this.usuarioActual.next({ logeado: true, nombre: usuarioData.nombre, esAdmin: false });
     }
 
     return { data: authData, error: null };
@@ -140,6 +144,7 @@ export class SupabaseService {
     fecha_nacimiento: string;
     tipo_sangre: string;
     color_ojos: string;
+    dias_vacaciones: number;
   }) {
     const { data: { user }, error: errorUsuario } = await this.supabase.auth.getUser();
     if (errorUsuario || !user) {
@@ -151,13 +156,31 @@ export class SupabaseService {
       p_apellido: datosPerfil.apellido,
       p_fecha_nacimiento: datosPerfil.fecha_nacimiento,
       p_tipo_sangre: datosPerfil.tipo_sangre,
-      p_color_ojos: datosPerfil.color_ojos
+      p_color_ojos: datosPerfil.color_ojos,
+      p_dias_vacaciones: datosPerfil.dias_vacaciones
     });
 
     if (!respuesta.error) {
       this.usuarioActual.next({ ...this.usuarioActual.value, nombre: datosPerfil.nombre });
     }
     return respuesta;
+  }
+
+  async confirmarContrasenaActual(contrasena: string) {
+    const { data: { user }, error: errorUsuario } = await this.supabase.auth.getUser();
+    if (errorUsuario || !user?.email) {
+      return { error: errorUsuario ?? new Error('No hay una sesión activa.') };
+    }
+
+    const { error } = await this.supabase.auth.signInWithPassword({
+      email: user.email,
+      password: contrasena
+    });
+    return { error };
+  }
+
+  async cambiarContrasena(contrasena: string) {
+    return await this.supabase.auth.updateUser({ password: contrasena });
   }
 
   async obtenerComprasUsuario() {
@@ -230,6 +253,44 @@ export class SupabaseService {
     return data || [];
   }
 
+  async obtenerMetricasAdministrador(periodo: 'semana' | 'mes') {
+    const { data, error } = await this.supabase.rpc('obtener_metricas_administrador', {
+      p_periodo: periodo
+    });
+
+    if (error) {
+      console.error('Error al cargar las métricas del administrador:', error.message);
+      throw error;
+    }
+
+    return data;
+  }
+
+  async obtenerAuditoriaAdministrador(dias = 30) {
+    const fechaDesde = new Date(Date.now() - dias * 24 * 60 * 60 * 1000).toISOString();
+    const tamanoPagina = 100;
+    const eventos: any[] = [];
+
+    for (let desde = 0; ; desde += tamanoPagina) {
+      const { data, error } = await this.supabase
+        .from('log_auditoria')
+        .select('id, ocurrido_en, usuario_nombre, accion, entidad, descripcion')
+        .gte('ocurrido_en', fechaDesde)
+        .order('ocurrido_en', { ascending: false })
+        .range(desde, desde + tamanoPagina - 1);
+
+      if (error) {
+        console.error('Error al cargar el registro de auditoría:', error.message);
+        throw error;
+      }
+
+      eventos.push(...(data || []));
+      if (!data || data.length < tamanoPagina) break;
+    }
+
+    return eventos;
+  }
+
   async canjearPuntosPorCreditos(puntos: number) {
     return await this.supabase.rpc('canjear_puntos_por_creditos', {
       p_puntos: puntos
@@ -291,7 +352,7 @@ export class SupabaseService {
         .select(`
           id,
           fecha_hora_inicio,
-          peliculas ( id, nombre, imagen, fecha_estreno, precio_base, precio_preventa, restriccion_edad ),
+          peliculas ( id, nombre, imagen, sinopsis, fecha_estreno, precio_base, precio_preventa, restriccion_edad ),
           salas ( id, nombre, capacidad )
         `)
         .eq('id', funcionId)
@@ -301,7 +362,25 @@ export class SupabaseService {
         console.error('Error al obtener detalle de la función:', error);
         return null;
       }
-      return data;
+      const pelicula = Array.isArray(data.peliculas) ? data.peliculas[0] : data.peliculas;
+      if (!pelicula) return data;
+
+      const { data: calificacion, error: errorCalificacion } = await this.supabase.rpc(
+        'obtener_calificacion_pelicula',
+        { p_pelicula_id: pelicula.id }
+      );
+      if (errorCalificacion) {
+        console.error('Error al obtener la calificación de la película:', errorCalificacion.message);
+      }
+
+      return {
+        ...data,
+        peliculas: {
+          ...pelicula,
+          calificacion_promedio: Number(calificacion?.promedio ?? 0),
+          cantidad_resenas: Number(calificacion?.cantidad ?? 0)
+        }
+      };
     }
     
   async obtenerMenuCandy() {
@@ -437,6 +516,14 @@ export class SupabaseService {
       .eq('sesion_id', sesionId);
   }
 
+  async liberarButacasDeSesion(funcionId: string, sesionId: string) {
+    await this.supabase
+      .from('butacas_bloqueadas')
+      .delete()
+      .eq('funcion_id', funcionId)
+      .eq('sesion_id', sesionId);
+  }
+
   // Escuchar cambios en tiempo real para actualizar la pantalla a otros usuarios
   suscribirseCambiosButacas(funcionId: string, callback: () => void) {
     return this.supabase
@@ -568,6 +655,12 @@ export class SupabaseService {
 
   async obtenerUsuarioActual(){
     return await this.supabase.auth.getUser();
+  }
+
+  async enviarTicketPorEmail(reservaId: string) {
+    return await this.supabase.functions.invoke('send-ticket-email', {
+      body: { reservaId }
+    });
   }
 
   async obtenerPeliculasEnCartelera() {

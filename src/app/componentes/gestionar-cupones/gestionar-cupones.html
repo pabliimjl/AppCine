@@ -1,0 +1,63 @@
+<main class="cupones-contenedor">
+  <a routerLink="/admin" class="volver">Volver al panel</a>
+  <header>
+    <h2>Cupones y descuentos</h2>
+    <p>Configura promociones, beneficios por edad y puntos de fidelización.</p>
+  </header>
+
+  <form [formGroup]="descuentosForm" (ngSubmit)="guardarConfiguracion()">
+    <fieldset>
+      <legend>Primera compra</legend>
+      <label class="opcion-activa">
+        <input type="checkbox" formControlName="primeraCompraActiva">
+        Activar cupón de primera compra
+      </label>
+      <div class="campos-descuento">
+        <label>
+          Código
+          <input type="text" formControlName="codigoPrimeraCompra" maxlength="30" placeholder="BIENVENIDA">
+        </label>
+        <label>
+          Descuento (%)
+          <input type="number" formControlName="descuentoPrimeraCompra" min="1" max="100">
+        </label>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Descuento por edad</legend>
+      <label class="opcion-activa">
+        <input type="checkbox" formControlName="mayores50Activos">
+        Activar descuento para personas mayores
+      </label>
+      <div class="campos-descuento">
+        <label>
+          Edad mínima
+          <input type="number" formControlName="edadMinima" min="1" max="120">
+        </label>
+        <label>
+          Descuento (%)
+          <input type="number" formControlName="descuentoMayores50" min="1" max="100">
+        </label>
+      </div>
+    </fieldset>
+
+    <fieldset class="fidelizacion">
+      <legend>Puntos de fidelización</legend>
+      <div class="campos-descuento">
+        <label>
+          Valor de canje por punto ($)
+          <input type="number" formControlName="valorPuntoPesos" min="0.01" max="1000000" step="0.01">
+        </label>
+      </div>
+      <p class="ayuda-puntos">Se acumula 1 punto por cada peso pagado con dinero. El valor indicado se usa al convertir puntos en créditos.</p>
+    </fieldset>
+
+    <div class="guardar-descuentos">
+      <p role="status" *ngIf="mensaje()">{{ mensaje() }}</p>
+      <button type="submit" [disabled]="guardando()">
+        {{ guardando() ? 'Guardando...' : 'Guardar configuración' }}
+      </button>
+    </div>
+  </form>
+</main>

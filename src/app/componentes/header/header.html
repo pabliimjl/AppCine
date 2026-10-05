@@ -1,5 +1,8 @@
 <header class="app-header">
   <div class="header-left">
+    <a class="btn-cartelera" routerLink="/" routerLinkActive="activo" [routerLinkActiveOptions]="{ exact: true }" *ocultarEnRutas="['/']">
+      Cartelera
+    </a>
   </div>
 
   <div class="header-right" *ocultarEnRutas="['/login', '/registro']">
@@ -10,6 +13,8 @@
       <div class="usuario-logueado">
         <span class="saludo">¡Bienvenido, {{ nombreUsuario() }}!</span>
         <a class="enlace-perfil" routerLink="/perfil" routerLinkActive="activo">Mi Perfil</a>
+        <a *requiereAdmin class="btn-admin" routerLink="/admin" routerLinkActive="activo">Admin</a>
+        <a *requiereAdmin class="btn-validar-qr" routerLink="/verificador" routerLinkActive="activo">Validar QR</a>
         <button class="btn-cerrar" (click)="cerrarSesion()">Salir</button>
       </div>
       
@@ -17,7 +22,7 @@
       
       <div class="invitado-bloque">
         <span class="texto-invitado">Usted está en modo invitado</span>
-        <button class="btn-login" routerLink="/login">Iniciar Sesión</button>
+        <button class="btn-login" routerLink="/login" routerLinkActive="activo">Iniciar Sesión</button>
       </div>
 
     }

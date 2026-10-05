@@ -5,6 +5,15 @@ import { RouterLink } from '@angular/router';
 import { QRCodeComponent } from 'angularx-qrcode';
 import { SupabaseService } from '../../servicios/supabase';
 
+interface DatosPerfil {
+  nombre: string;
+  apellido: string;
+  fecha_nacimiento: string;
+  tipo_sangre: string;
+  color_ojos: string;
+  dias_vacaciones: number;
+}
+
 @Component({
   selector: 'app-perfil-usuario',
   standalone: true,
@@ -17,7 +26,6 @@ export class PerfilUsuarioComponent implements OnInit {
   private supabaseService = inject(SupabaseService);
 
   email = signal('');
-  diasVacaciones = signal<number | null>(null);
   creditos = signal(0);
   puntos = signal(0);
   valorPuntoPesos = signal(1);
@@ -25,7 +33,10 @@ export class PerfilUsuarioComponent implements OnInit {
   movimientosCreditos = signal<any[]>([]);
   movimientosPuntos = signal<any[]>([]);
   resenas = signal<any[]>([]);
-  seccionActiva = signal<'datos' | 'creditos' | 'puntos' | 'compras' | 'peliculas'>('datos');
+  seccionActiva = signal<'datos' | 'contrasena' | 'creditos' | 'puntos' | 'compras' | 'peliculas'>('datos');
+  perfilCargado = signal(false);
+  editandoDatos = signal(false);
+  datosGuardados = signal<DatosPerfil | null>(null);
   peliculaResenaActiva = signal<string | null>(null);
   compraCancelando = signal<string | null>(null);
   qrCompraVisible = signal<string | null>(null);
@@ -33,6 +44,7 @@ export class PerfilUsuarioComponent implements OnInit {
   canjeandoPuntos = signal(false);
   cargando = signal(true);
   guardando = signal(false);
+  guardandoContrasena = signal(false);
   mensajeError = signal<string | null>(null);
   mensajeExito = signal<string | null>(null);
   mensajeCuenta = signal<string | null>(null);
@@ -56,7 +68,15 @@ export class PerfilUsuarioComponent implements OnInit {
     apellido: ['', [Validators.required, Validators.maxLength(80)]],
     fecha_nacimiento: ['', Validators.required],
     tipo_sangre: ['', [Validators.required, Validators.maxLength(10)]],
-    color_ojos: ['', [Validators.required, Validators.maxLength(40)]]
+    color_ojos: ['', [Validators.required, Validators.maxLength(40)]],
+    dias_vacaciones: [0, [Validators.required, Validators.min(0), Validators.max(365), Validators.pattern(/^\d+$/)]],
+    contrasenaActual: ['', Validators.required]
+  });
+
+  contrasenaForm = this.fb.group({
+    contrasenaActual: ['', Validators.required],
+    contrasenaNueva: ['', [Validators.required, Validators.minLength(6)]],
+    confirmarContrasena: ['', [Validators.required, Validators.minLength(6)]]
   });
 
   async ngOnInit() {
@@ -77,14 +97,17 @@ export class PerfilUsuarioComponent implements OnInit {
         return;
       }
 
-      this.perfilForm.patchValue({
+      const datosPerfil: DatosPerfil = {
         nombre: perfil.nombre ?? '',
         apellido: perfil.apellido ?? '',
         fecha_nacimiento: perfil.fecha_nacimiento ?? '',
         tipo_sangre: perfil.tipo_sangre ?? '',
-        color_ojos: perfil.color_ojos ?? ''
-      });
-      this.diasVacaciones.set(perfil.dias_vacaciones ?? null);
+        color_ojos: perfil.color_ojos ?? '',
+        dias_vacaciones: Number(perfil.dias_vacaciones ?? 0)
+      };
+      this.perfilForm.patchValue(datosPerfil);
+      this.datosGuardados.set(datosPerfil);
+      this.perfilCargado.set(true);
       this.creditos.set(Number(perfil.creditos ?? 0));
       this.puntos.set(Number(perfil.puntos ?? 0));
       this.valorPuntoPesos.set(Number(configuracion.valorPuntoPesos ?? 1));
@@ -111,17 +134,29 @@ export class PerfilUsuarioComponent implements OnInit {
     this.mensajeExito.set(null);
 
     try {
+      const { contrasenaActual, ...datosPerfil } = this.perfilForm.getRawValue();
+      const validacion = await this.supabaseService.confirmarContrasenaActual(contrasenaActual ?? '');
+      if (validacion.error) {
+        this.mensajeError.set('La contraseña actual no es correcta.');
+        return;
+      }
+
       const { error } = await this.supabaseService.actualizarPerfilUsuario(
-        this.perfilForm.getRawValue() as {
+        datosPerfil as {
           nombre: string;
           apellido: string;
           fecha_nacimiento: string;
           tipo_sangre: string;
           color_ojos: string;
+          dias_vacaciones: number;
         }
       );
 
       if (error) throw error;
+      this.datosGuardados.set(datosPerfil as DatosPerfil);
+      this.perfilForm.controls.contrasenaActual.reset('');
+      this.editandoDatos.set(false);
+      this.perfilForm.markAsPristine();
       this.mensajeExito.set('Perfil actualizado.');
     } catch (error: any) {
       console.error('Error al actualizar el perfil:', error);
@@ -131,9 +166,68 @@ export class PerfilUsuarioComponent implements OnInit {
     }
   }
 
-  seleccionarSeccion(seccion: 'datos' | 'creditos' | 'puntos' | 'compras' | 'peliculas') {
+  editarDatos() {
+    this.mensajeError.set(null);
+    this.mensajeExito.set(null);
+    this.editandoDatos.set(true);
+  }
+
+  cancelarEdicionDatos() {
+    const datos = this.datosGuardados();
+    if (datos) this.perfilForm.patchValue(datos);
+    this.perfilForm.controls.contrasenaActual.reset('');
+    this.perfilForm.markAsPristine();
+    this.perfilForm.markAsUntouched();
+    this.editandoDatos.set(false);
+    this.mensajeError.set(null);
+    this.mensajeExito.set(null);
+  }
+
+  contrasenasNoCoinciden(): boolean {
+    const { contrasenaNueva, confirmarContrasena } = this.contrasenaForm.getRawValue();
+    return Boolean(confirmarContrasena && contrasenaNueva !== confirmarContrasena);
+  }
+
+  async cambiarContrasena() {
+    if (this.contrasenaForm.invalid || this.guardandoContrasena()) {
+      this.contrasenaForm.markAllAsTouched();
+      return;
+    }
+    if (this.contrasenasNoCoinciden()) {
+      this.mensajeCuenta.set('La nueva contraseña y su confirmación no coinciden.');
+      return;
+    }
+
+    this.guardandoContrasena.set(true);
+    this.mensajeCuenta.set(null);
+    try {
+      const { contrasenaActual, contrasenaNueva } = this.contrasenaForm.getRawValue();
+      const validacion = await this.supabaseService.confirmarContrasenaActual(contrasenaActual ?? '');
+      if (validacion.error) {
+        this.mensajeCuenta.set('La contraseña actual no es correcta.');
+        return;
+      }
+
+      const { error } = await this.supabaseService.cambiarContrasena(contrasenaNueva ?? '');
+      if (error) throw error;
+
+      this.contrasenaForm.reset();
+      this.mensajeCuenta.set('Contraseña actualizada.');
+    } catch (error: any) {
+      console.error('Error al cambiar la contraseña:', error);
+      this.mensajeCuenta.set(error?.message || 'No se pudo cambiar la contraseña.');
+    } finally {
+      this.guardandoContrasena.set(false);
+    }
+  }
+
+  seleccionarSeccion(seccion: 'datos' | 'contrasena' | 'creditos' | 'puntos' | 'compras' | 'peliculas') {
+    if (seccion !== 'datos' && this.editandoDatos()) this.cancelarEdicionDatos();
     this.seccionActiva.set(seccion);
     this.mensajeCuenta.set(null);
+    this.mensajeError.set(null);
+    this.mensajeExito.set(null);
+    if (seccion !== 'contrasena') this.contrasenaForm.reset();
     this.peliculaResenaActiva.set(null);
   }
 

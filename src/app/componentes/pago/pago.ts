@@ -343,4 +343,25 @@ export class PagoComponent implements OnInit, OnDestroy {
       this.estadoPago.set('pendiente'); 
     }
   }
+
+  volverACandy() {
+    this.router.navigate(['/candy', this.funcionId()], {
+      state: {
+        butacas: this.datosReserva.butacas || [],
+        totalAcumulado: this.datosReserva.totalEntradas || 0,
+        itemsCandy: this.datosReserva.itemsCandy || []
+      }
+    });
+  }
+
+  async cancelarCompra() {
+    const idFuncion = this.funcionId();
+    if (idFuncion) {
+      await this.supabaseService.liberarButacasDeSesion(
+        idFuncion,
+        this.supabaseService.obtenerSesionId()
+      );
+    }
+    this.router.navigate(['/']);
+  }
 }

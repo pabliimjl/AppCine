@@ -41,6 +41,36 @@
     font-weight: 500;
   }
 
+  .estado-email {
+    color: #a1a1aa;
+    font-size: 0.9rem;
+  }
+
+  .error-email {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    color: #ff8b91;
+    font-size: 0.9rem;
+
+    button {
+      min-height: 36px;
+      padding: 0 12px;
+      border: 1px solid #6b3539;
+      border-radius: 4px;
+      background: transparent;
+      color: #ff9a9f;
+      cursor: pointer;
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: wait;
+      }
+    }
+  }
+
   .aviso-edad {
     max-width: 560px;
     margin: 16px auto 0;

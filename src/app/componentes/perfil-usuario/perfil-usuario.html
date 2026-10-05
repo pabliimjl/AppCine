@@ -11,11 +11,12 @@
     </header>
 
     <nav class="menu-perfil" aria-label="Secciones del perfil">
-      <button type="button" [class.activo]="seccionActiva() === 'datos'" (click)="seleccionarSeccion('datos')">Cambiar datos</button>
       <button type="button" [class.activo]="seccionActiva() === 'creditos'" (click)="seleccionarSeccion('creditos')">Mis créditos</button>
       <button type="button" [class.activo]="seccionActiva() === 'puntos'" (click)="seleccionarSeccion('puntos')">Mis puntos</button>
       <button type="button" [class.activo]="seccionActiva() === 'compras'" (click)="seleccionarSeccion('compras')">Mis compras</button>
       <button type="button" [class.activo]="seccionActiva() === 'peliculas'" (click)="seleccionarSeccion('peliculas')">Mis películas</button>
+      <button type="button" [class.activo]="seccionActiva() === 'datos'" (click)="seleccionarSeccion('datos')">Mis datos</button>
+      <button type="button" [class.activo]="seccionActiva() === 'contrasena'" (click)="seleccionarSeccion('contrasena')">Cambiar contraseña</button>
     </nav>
 
     <p class="estado-formulario error" role="alert" *ngIf="seccionActiva() === 'datos' && mensajeError()">{{ mensajeError() }}</p>
@@ -23,7 +24,19 @@
     <p class="estado-formulario exito" role="status" *ngIf="mensajeCuenta()">{{ mensajeCuenta() }}</p>
     <div class="cargando-perfil" *ngIf="cargando()">Cargando perfil...</div>
 
-    <form *ngIf="!cargando() && !mensajeError() && seccionActiva() === 'datos'" [formGroup]="perfilForm" (ngSubmit)="guardarPerfil()">
+    <section class="seccion-datos" *ngIf="!cargando() && perfilCargado() && seccionActiva() === 'datos'">
+      <div class="datos-resumen" *ngIf="datosGuardados() as datos">
+        <article><span>Correo electrónico</span><strong>{{ email() }}</strong></article>
+        <article><span>Nombre</span><strong>{{ datos.nombre }} {{ datos.apellido }}</strong></article>
+        <article><span>Fecha de nacimiento</span><strong>{{ datos.fecha_nacimiento | date:'dd/MM/yyyy' }}</strong></article>
+        <article><span>Tipo de sangre</span><strong>{{ datos.tipo_sangre }}</strong></article>
+        <article><span>Color de ojos</span><strong>{{ datos.color_ojos }}</strong></article>
+        <article><span>Días de vacaciones al año</span><strong>{{ datos.dias_vacaciones }}</strong></article>
+      </div>
+
+      <button *ngIf="!editandoDatos()" class="guardar-perfil" type="button" (click)="editarDatos()">Editar</button>
+
+      <form *ngIf="editandoDatos()" [formGroup]="perfilForm" (ngSubmit)="guardarPerfil()">
       <label class="campo-perfil solo-lectura">
         <span>Correo electrónico</span>
         <input type="email" [value]="email()" readonly>
@@ -59,15 +72,50 @@
         </label>
       </div>
 
-      <label class="campo-perfil solo-lectura" *ngIf="diasVacaciones() !== null">
+      <label class="campo-perfil">
         <span>Días de vacaciones al año</span>
-        <input type="number" [value]="diasVacaciones()" readonly>
+        <input type="number" formControlName="dias_vacaciones" min="0" max="365" step="1">
+        <small *ngIf="perfilForm.controls.dias_vacaciones.touched && perfilForm.controls.dias_vacaciones.invalid">Ingresá un número entero entre 0 y 365.</small>
       </label>
 
-      <button class="guardar-perfil" type="submit" [disabled]="guardando()">
-        {{ guardando() ? 'Guardando...' : 'Guardar cambios' }}
-      </button>
-    </form>
+      <label class="campo-perfil">
+        <span>Confirmá tu contraseña actual para guardar los cambios</span>
+        <input type="password" formControlName="contrasenaActual" autocomplete="current-password">
+        <small *ngIf="perfilForm.controls.contrasenaActual.touched && perfilForm.controls.contrasenaActual.invalid">Ingresá tu contraseña actual.</small>
+      </label>
+
+      <div class="acciones-edicion">
+        <button class="guardar-perfil" type="submit" [disabled]="guardando()">
+          {{ guardando() ? 'Guardando...' : 'Guardar cambios' }}
+        </button>
+        <button class="cancelar-edicion" type="button" (click)="cancelarEdicionDatos()">Cancelar</button>
+      </div>
+      </form>
+    </section>
+
+    <section class="seccion-cuenta" *ngIf="!cargando() && seccionActiva() === 'contrasena'">
+      <h2>Cambiar contraseña</h2>
+      <form [formGroup]="contrasenaForm" (ngSubmit)="cambiarContrasena()">
+        <label class="campo-perfil">
+          <span>Contraseña actual</span>
+          <input type="password" formControlName="contrasenaActual" autocomplete="current-password">
+          <small *ngIf="contrasenaForm.controls.contrasenaActual.touched && contrasenaForm.controls.contrasenaActual.invalid">Ingresá tu contraseña actual.</small>
+        </label>
+        <label class="campo-perfil">
+          <span>Nueva contraseña</span>
+          <input type="password" formControlName="contrasenaNueva" autocomplete="new-password">
+          <small *ngIf="contrasenaForm.controls.contrasenaNueva.touched && contrasenaForm.controls.contrasenaNueva.invalid">La contraseña debe tener al menos 6 caracteres.</small>
+        </label>
+        <label class="campo-perfil">
+          <span>Repetir nueva contraseña</span>
+          <input type="password" formControlName="confirmarContrasena" autocomplete="new-password">
+          <small *ngIf="contrasenaForm.controls.confirmarContrasena.touched && contrasenasNoCoinciden()">Las contraseñas no coinciden.</small>
+        </label>
+        <button class="guardar-perfil" type="submit" [disabled]="guardandoContrasena()">
+          {{ guardandoContrasena() ? 'Actualizando...' : 'Cambiar contraseña' }}
+        </button>
+      </form>
+    </section>
 
     <section class="seccion-cuenta" *ngIf="!cargando() && seccionActiva() === 'creditos'">
       <div class="saldo-creditos">
@@ -138,10 +186,10 @@
       <p class="vacio-cuenta" *ngIf="compras().length === 0">Todavía no hay compras asociadas a tu cuenta.</p>
 
       <article class="compra-usuario" *ngFor="let compra of compras()">
-        <img *ngIf="compra.pelicula?.imagen" [src]="compra.pelicula.imagen" [alt]="compra.pelicula.nombre">
+        <img *ngIf="compra.pelicula?.imagen" [src]="compra.pelicula.imagen" [alt]="compra.pelicula.nombre | uppercase">
         <div class="compra-detalle">
           <div class="compra-titulo-fila">
-            <h3>{{ compra.pelicula?.nombre || 'Compra de cine' }}</h3>
+            <h3>{{ (compra.pelicula?.nombre || 'Compra de cine') | uppercase }}</h3>
             <span class="estado-compra" [class.cancelada]="compra.cancelada_en">
               {{ compra.cancelada_en ? 'Cancelada' : compra.entradas_retiradas || compra.candy_retirado ? 'Utilizada' : 'Activa' }}
             </span>
@@ -192,9 +240,9 @@
 
       <div class="historial-peliculas">
         <article class="pelicula-historial" *ngFor="let pelicula of peliculasHistorial()">
-          <img [src]="pelicula.imagen" [alt]="pelicula.nombre">
+          <img [src]="pelicula.imagen" [alt]="pelicula.nombre | uppercase">
           <div class="pelicula-historial-info">
-            <h3>{{ pelicula.nombre }}</h3>
+            <h3>{{ pelicula.nombre | uppercase }}</h3>
             <p>{{ pelicula.generos?.join(', ') }}</p>
             <small>Función: {{ pelicula.fecha_hora_inicio | date:'dd/MM/yyyy' }}</small>
 

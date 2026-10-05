@@ -6,6 +6,11 @@
     <p>Tu lugar está asegurado. 
       <span *ngIf="emailEnviado()" class="badge-email">Ticket enviado a {{ emailUsuario() }}</span>
     </p>
+    <p class="estado-email" role="status" *ngIf="enviandoEmail()">Enviando el ticket a {{ emailUsuario() }}...</p>
+    <div class="error-email" role="alert" *ngIf="errorEmail()">
+      <span>{{ errorEmail() }}</span>
+      <button type="button" (click)="enviarTicketPorEmail()" [disabled]="enviandoEmail()">Reintentar envío</button>
+    </div>
     <div class="aviso-edad" role="note" *ngIf="esCompraAnonima() && detallesReserva()?.pelicula?.restriccion_edad as edad">
       <strong>Clasificación +{{ edad }}</strong>
       <p *ngIf="edad < 18">Para asistir, tenés que tener {{ edad }} años o más, o ir acompañado por un adulto.</p>

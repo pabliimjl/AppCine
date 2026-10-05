@@ -14,3 +14,50 @@ app-root {
 	width: 100%;
 	background-color: #000000;
 }
+
+.acciones-compra {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+	margin-bottom: 20px;
+}
+
+.acciones-compra button {
+	min-height: 40px;
+	padding: 8px 12px;
+	border: 1px solid transparent;
+	background: transparent;
+	font: inherit;
+	font-weight: 600;
+	cursor: pointer;
+}
+
+.acciones-compra .btn-volver {
+	border-color: #555;
+	border-radius: 4px;
+	color: #fff;
+}
+
+.acciones-compra .btn-volver:hover {
+	background: #292929;
+}
+
+.acciones-compra .btn-cancelar {
+	color: #ff6870;
+}
+
+.acciones-compra .btn-cancelar:hover {
+	text-decoration: underline;
+	text-underline-offset: 3px;
+}
+
+.acciones-compra button:focus-visible {
+	outline: 2px solid #fff;
+	outline-offset: 2px;
+}
+
+@media (max-width: 480px) {
+	.acciones-compra {
+		gap: 8px;
+	}
+}

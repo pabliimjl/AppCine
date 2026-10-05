@@ -1,15 +1,34 @@
 <!-- Leemos el signal y lo guardamos temporalmente en 'df' para más comodidad -->
 <section class="reserva-container" *ngIf="detalleFuncion() as df">
+  <nav class="acciones-compra" aria-label="Navegación de compra">
+    <button type="button" class="btn-volver" (click)="volver()">← Volver</button>
+    <button type="button" class="btn-cancelar" (click)="cancelarCompra()">Cancelar compra</button>
+  </nav>
   
   <div class="info-pelicula">
-    <img [src]="df.peliculas.imagen" [alt]="df.peliculas.nombre">
+    <img [src]="df.peliculas.imagen" [alt]="df.peliculas.nombre | uppercase">
     <div>
-      <h2>{{ df.peliculas.nombre }}</h2>
+      <h2>{{ df.peliculas.nombre | uppercase }}</h2>
       <p><strong>Sala:</strong> {{ df.salas.nombre }}</p>
       <p><strong>Horario:</strong> {{ df.fecha_hora_inicio | date:'dd/MM/yyyy HH:mm' }}</p>
       <p class="badge-preventa" *ngIf="esPreventa()">Precio de preventa aplicado</p>
     </div>
   </div>
+
+  <section class="detalle-pelicula" aria-label="Información de la película">
+    <div class="calificacion-pelicula">
+      <div class="estrellas-calificacion" role="img" [attr.aria-label]="df.peliculas.calificacion_promedio + ' de 5 estrellas'">
+        <span *ngFor="let estrella of estrellas" [class.seleccionada]="estrella <= calificacionRedondeada()" aria-hidden="true">★</span>
+      </div>
+      <strong *ngIf="df.peliculas.cantidad_resenas > 0">{{ df.peliculas.calificacion_promedio | number:'1.1-1' }}/5</strong>
+      <span *ngIf="df.peliculas.cantidad_resenas === 0">Sin reseñas todavía</span>
+      <small *ngIf="df.peliculas.cantidad_resenas > 0">{{ df.peliculas.cantidad_resenas }} reseñas</small>
+    </div>
+    <div class="sinopsis-pelicula">
+      <h3>Sinopsis</h3>
+      <p>{{ df.peliculas.sinopsis || 'Sin sinopsis disponible.' }}</p>
+    </div>
+  </section>
 
   <div class="seleccion-entradas">
     <h3>Selecciona tus entradas</h3>

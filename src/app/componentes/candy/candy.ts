@@ -51,6 +51,7 @@ export class CandyComponent implements OnInit {
     if (nav?.extras.state) {
       this.butacasSeleccionadas.set(nav.extras.state['butacas'] || []);
       this.totalEntradas.set(nav.extras.state['totalAcumulado'] || 0);
+      this.carrito.set(nav.extras.state['itemsCandy'] || []);
     }
   }
 
@@ -124,5 +125,30 @@ export class CandyComponent implements OnInit {
         totalFinal: this.totalFinal()
       }
     });
+  }
+
+  volverAButacas() {
+    const butacas = this.butacasSeleccionadas();
+    this.router.navigate(['/compra', this.funcionId()], {
+      state: {
+        entradasSeleccionadas: {
+          general: butacas.filter(butaca => butaca.tipo === 'regular').length,
+          discapacitado: butacas.filter(butaca => butaca.tipo === 'accesible').length,
+          vip: butacas.filter(butaca => butaca.tipo === 'vip').length
+        },
+        totalPagar: this.totalEntradas()
+      }
+    });
+  }
+
+  async cancelarCompra() {
+    const idFuncion = this.funcionId();
+    if (idFuncion) {
+      await this.supabaseService.liberarButacasDeSesion(
+        idFuncion,
+        this.supabaseService.obtenerSesionId()
+      );
+    }
+    this.router.navigate(['/']);
   }
 }

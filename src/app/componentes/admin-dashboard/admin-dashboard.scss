@@ -46,12 +46,224 @@
       .numero {
         font-size: 2.2rem;
         font-weight: bold;
-        color: #ff4081;
+        color: #e50914;
       }
 
       .etiqueta {
         font-size: 0.85rem;
         color: #aaaaaa;
+      }
+    }
+  }
+
+  .metricas-ventas {
+    margin-bottom: 36px;
+    padding: 24px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+
+    h3,
+    h4 {
+      margin: 0;
+    }
+
+    h3 {
+      font-size: 1.3rem;
+    }
+
+    h4 {
+      font-size: 1rem;
+    }
+
+    .encabezado-seccion,
+    .titulo-ranking {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .acciones-metricas {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .exportar {
+      min-height: 38px;
+      padding: 0 12px;
+      border: 1px solid #e50914;
+      border-radius: 4px;
+      background: transparent;
+      color: #fff;
+      font: inherit;
+      font-weight: 600;
+      cursor: pointer;
+
+      &:hover:not(:disabled) {
+        background: #e50914;
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    }
+
+    .encabezado-seccion p {
+      margin: 6px 0 0;
+      color: #aaa;
+      font-size: 0.85rem;
+    }
+
+    .actualizar {
+      width: 38px;
+      height: 38px;
+      flex: 0 0 38px;
+      border: 1px solid #555;
+      border-radius: 4px;
+      background: #242426;
+      color: #fff;
+      font-size: 1.35rem;
+      cursor: pointer;
+
+      &:disabled {
+        opacity: 0.55;
+        cursor: wait;
+      }
+    }
+
+    .estado-metricas,
+    .sin-datos {
+      color: #aaa;
+      font-size: 0.9rem;
+    }
+
+    .resumen-ventas {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 20px;
+
+      article {
+        display: grid;
+        gap: 8px;
+        padding: 16px 0;
+        border-bottom: 2px solid #e50914;
+      }
+
+      span {
+        color: #aaa;
+        font-size: 0.85rem;
+      }
+
+      strong {
+        font-size: 1.6rem;
+      }
+    }
+
+    .grafico-facturacion {
+      margin-top: 28px;
+    }
+
+    .barras-facturacion {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 10px;
+      height: 180px;
+      margin-top: 14px;
+      border-bottom: 1px solid #555;
+    }
+
+    .dia-facturacion {
+      display: grid;
+      grid-template-rows: 24px minmax(0, 1fr) 24px;
+      min-width: 0;
+      text-align: center;
+
+      .monto-dia,
+      .fecha-dia {
+        overflow: hidden;
+        color: #aaa;
+        font-size: 0.7rem;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .contenedor-barra {
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+      }
+
+      .barra {
+        width: min(30px, 70%);
+        min-height: 0;
+        border-radius: 3px 3px 0 0;
+        background: #e50914;
+      }
+    }
+
+    .rankings-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 28px;
+      margin-top: 28px;
+    }
+
+    .selector-periodo {
+      display: flex;
+      gap: 4px;
+      padding: 3px;
+      background: #242426;
+
+      button {
+        padding: 7px 10px;
+        border: 0;
+        border-radius: 3px;
+        background: transparent;
+        color: #aaa;
+        cursor: pointer;
+
+        &.activo {
+          background: #e50914;
+          color: #fff;
+          font-weight: 600;
+        }
+      }
+    }
+
+    ol {
+      display: grid;
+      gap: 12px;
+      margin: 16px 0 0;
+      padding: 0;
+      list-style: none;
+
+      li {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        font-size: 0.88rem;
+      }
+
+      li > span {
+        min-width: 0;
+      }
+
+      strong {
+        flex: 0 0 auto;
+        color: #ff737b;
+        font-size: 0.8rem;
+      }
+
+      small {
+        display: block;
+        margin-top: 3px;
+        color: #888;
       }
     }
   }
@@ -81,7 +293,7 @@
       &:hover {
         transform: translateY(-4px);
         background: rgba(255, 255, 255, 0.07);
-        border-color: #ff4081;
+        border-color: #e50914;
 
         .icono {
           transform: scale(1.1);
@@ -112,109 +324,6 @@
     }
   }
 
-  .configuracion-descuentos {
-    margin-top: 32px;
-    padding-top: 24px;
-    border-top: 1px solid rgba(255, 255, 255, 0.12);
-
-    h3 {
-      margin: 0 0 18px;
-      font-size: 1.2rem;
-    }
-
-    form {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 16px;
-    }
-
-    fieldset {
-      min-width: 0;
-      margin: 0;
-      padding: 16px;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 8px;
-    }
-
-    fieldset:last-of-type {
-      grid-column: 1 / -1;
-    }
-
-    legend {
-      padding: 0 6px;
-      color: #ff8aad;
-      font-weight: 600;
-    }
-
-    .opcion-activa {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 16px;
-      color: #ddd;
-      font-size: 0.9rem;
-    }
-
-    .campos-descuento {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-
-      label {
-        display: grid;
-        gap: 6px;
-        color: #aaa;
-        font-size: 0.82rem;
-      }
-
-      input {
-        width: 100%;
-        min-width: 0;
-        box-sizing: border-box;
-        padding: 10px;
-        border: 1px solid #555;
-        border-radius: 4px;
-        background: #242426;
-        color: #fff;
-      }
-    }
-
-    .ayuda-puntos {
-      margin: 10px 0 0;
-      color: #aaa;
-      font-size: 0.82rem;
-      line-height: 1.45;
-    }
-
-    .guardar-descuentos {
-      grid-column: 1 / -1;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-
-      p {
-        margin: 0;
-        color: #aaa;
-        font-size: 0.9rem;
-      }
-
-      button {
-        padding: 11px 16px;
-        border: 0;
-        border-radius: 4px;
-        background: #e50914;
-        color: white;
-        font-weight: 600;
-        cursor: pointer;
-
-        &:disabled {
-          opacity: 0.65;
-          cursor: wait;
-        }
-      }
-    }
-  }
 }
 
 @media (max-width: 640px) {
@@ -228,19 +337,22 @@
     }
 
     .metricas-grid,
-    .acciones-grid {
+    .acciones-grid,
+    .rankings-grid {
       grid-template-columns: minmax(0, 1fr);
     }
 
-    .configuracion-descuentos {
-      form,
-      .campos-descuento {
+    .metricas-ventas {
+      .resumen-ventas {
         grid-template-columns: minmax(0, 1fr);
       }
 
-      .guardar-descuentos {
-        align-items: flex-start;
-        flex-direction: column;
+      .barras-facturacion {
+        gap: 4px;
+      }
+
+      .dia-facturacion .monto-dia {
+        font-size: 0.58rem;
       }
     }
 

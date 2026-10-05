@@ -97,7 +97,7 @@
     <h3>Películas en Base de Datos ({{ peliculas().length }})</h3>
     <ul>
       <li *ngFor="let p of peliculas()">
-        <span><strong>{{ p.nombre }}</strong> ({{ p.duracion }} min)</span>
+        <span><strong>{{ p.nombre | uppercase }}</strong> ({{ p.duracion }} min)</span>
         <span class="tags">Formatos: {{ p.formatos?.join(', ') }}</span>
         <div class="acciones-pelicula">
           <button type="button" class="btn-editar" [disabled]="cargando()" (click)="editarPelicula(p)">Editar</button>

@@ -28,6 +28,27 @@ El proyecto modela el flujo de una plataforma de cine: consulta de cartelera y f
 - **SheetJS (`xlsx`)** para exportar informes en formato Excel `.xlsx`.
 - **Firebase Hosting** como destino de publicación configurado.
 
+## Arquitectura
+
+```mermaid
+flowchart LR
+    Usuario[Usuario] --> App[Angular: Cine Scalas]
+
+    App --> Vistas[Interfaz<br/>Cartelera, compra, perfil y paneles]
+    App --> Router[Rutas y guards<br/>sesión, admin y empleado]
+    Vistas --> Servicio[SupabaseService]
+
+    Servicio --> Supabase[Supabase]
+    Supabase --> Auth[Auth]
+    Supabase --> DB[PostgreSQL + RLS]
+    Supabase --> Realtime[Realtime<br/>butacas]
+    Supabase --> Storage[Storage<br/>imágenes]
+    Supabase --> Edge[Edge Function<br/>envío de tickets]
+
+    Build[Build Angular] --> Firebase[Firebase Hosting]
+    Firebase --> App
+```
+
 ## Requisitos
 
 - Node.js compatible con Angular 22.

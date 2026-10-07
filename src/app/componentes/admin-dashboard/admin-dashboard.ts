@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { jsPDF } from 'jspdf';
@@ -15,6 +15,8 @@ import { SupabaseService } from '../../servicios/supabase';
 export class AdminDashboard implements OnInit {
   private supabaseService = inject(SupabaseService);
 
+  esAdmin = signal(false);
+  rutaBase = computed(() => this.esAdmin() ? '/admin' : '/empleado');
   totalPeliculas = signal<number>(0);
   totalProductos = signal<number>(0);
   totalCombos = signal<number>(0);
@@ -26,7 +28,9 @@ export class AdminDashboard implements OnInit {
 
 
   async ngOnInit() {
-    await Promise.all([this.cargarMetricas(), this.cargarMetricasVentas()]);
+    const perfil = await this.supabaseService.obtenerPerfilUsuario();
+    this.esAdmin.set(perfil?.rol === 'admin');
+    if (this.esAdmin()) await Promise.all([this.cargarMetricas(), this.cargarMetricasVentas()]);
   }
 
   async cambiarPeriodoPeliculas(periodo: 'semana' | 'mes') {

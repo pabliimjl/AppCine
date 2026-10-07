@@ -1,0 +1,58 @@
+<main class="gestion-empleados">
+  <a routerLink="/admin" class="volver">← Volver al panel</a>
+  <header>
+    <h2>Gestionar empleados</h2>
+    <p>Asigna o quita el acceso operativo a usuarios registrados.</p>
+  </header>
+
+  <p class="estado error" role="alert" *ngIf="error()">{{ error() }}</p>
+  <p class="estado exito" role="status" *ngIf="mensaje()">{{ mensaje() }}</p>
+  <p class="estado" *ngIf="cargando()">Cargando usuarios...</p>
+
+  <div class="tabla-contenedor" *ngIf="!cargando()">
+    <div class="busqueda">
+      <label for="buscar-usuario">Buscar por nombre o correo</label>
+      <input
+        id="buscar-usuario"
+        type="search"
+        [value]="busqueda()"
+        (input)="actualizarBusqueda($event)"
+        placeholder="Nombre, apellido o correo">
+      <span aria-live="polite">{{ perfilesFiltrados().length }} resultados</span>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th scope="col">Usuario</th>
+          <th scope="col">Correo</th>
+          <th scope="col">Rol</th>
+          <th scope="col">Acción</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let perfil of perfilesFiltrados()">
+          <td data-label="Usuario">{{ perfil.nombre }} {{ perfil.apellido }}</td>
+          <td data-label="Correo">{{ perfil.email }}</td>
+          <td data-label="Rol"><span class="rol" [class.empleado]="perfil.rol === 'empleado'">{{ perfil.rol }}</span></td>
+          <td data-label="Acción">
+            <button
+              *ngIf="perfil.rol !== 'admin'"
+              type="button"
+              [class.revocar]="perfil.rol === 'empleado'"
+              [disabled]="procesandoId() !== null"
+              (click)="cambiarRol(perfil)">
+              {{ procesandoId() === perfil.id ? 'Guardando...' : perfil.rol === 'empleado' ? 'Quitar empleado' : 'Hacer empleado' }}
+            </button>
+            <span *ngIf="perfil.rol === 'admin'">Administrador</span>
+          </td>
+        </tr>
+        <tr *ngIf="perfilesFiltrados().length === 0">
+          <td colspan="4" class="sin-usuarios">
+            {{ perfiles().length === 0 ? 'No hay usuarios registrados.' : 'No se encontraron usuarios con esa búsqueda.' }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</main>

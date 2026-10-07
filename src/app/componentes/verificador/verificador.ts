@@ -1,19 +1,21 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
 import { ZXingScannerModule } from '@zxing/ngx-scanner';
 import { SupabaseService } from '../../servicios/supabase';
 
 @Component({
   selector: 'app-verificador',
   standalone: true,
-  imports: [CommonModule, FormsModule, ZXingScannerModule],
+  imports: [CommonModule, FormsModule, RouterLink, ZXingScannerModule],
   templateUrl: './verificador.html',
   styleUrls: ['./verificador.scss']
 })
 
 export class VerificadorComponent {
   private supabaseService = inject(SupabaseService);
+  rutaVolver = inject(Router).url.startsWith('/empleado') ? '/empleado' : '/admin';
 
   codigoIngresado = signal<string>('');
   reserva = signal<any>(null);

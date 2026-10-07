@@ -30,10 +30,11 @@ export const CONFIGURACION_DESCUENTOS_POR_DEFECTO: ConfiguracionDescuentos = {
 export class SupabaseService {
   private supabase: SupabaseClient;
 
-  private usuarioActual = new BehaviorSubject<{ logeado: boolean; nombre: string | null; esAdmin: boolean }>({
+  private usuarioActual = new BehaviorSubject<{ logeado: boolean; nombre: string | null; esAdmin: boolean; rol: string | null }>({
     logeado: false,
     nombre: null,
-    esAdmin: false
+    esAdmin: false,
+    rol: null
   });
   public estadoUsuario$ = this.usuarioActual.asObservable();
 
@@ -50,13 +51,13 @@ export class SupabaseService {
     const { data: { session } } = await this.supabase.auth.getSession();
     if (session && session.user) {
       const perfil = await this.obtenerPerfilUsuario();
-      this.usuarioActual.next({ logeado: true, nombre: perfil?.nombre || 'Usuario', esAdmin: perfil?.rol === 'admin' });
+      this.usuarioActual.next({ logeado: true, nombre: perfil?.nombre || 'Usuario', esAdmin: perfil?.rol === 'admin', rol: perfil?.rol ?? null });
     }
   }
 
   async cerrarSesion() {
     await this.supabase.auth.signOut();
-    this.usuarioActual.next({ logeado: false, nombre: null, esAdmin: false });
+    this.usuarioActual.next({ logeado: false, nombre: null, esAdmin: false, rol: null });
   }
 
   async obtenerPeliculas() {
@@ -84,7 +85,7 @@ export class SupabaseService {
     // Si el login es exitoso, actualizamos el estado reactivo
     if (respuesta.data.session) {
       const perfil = await this.obtenerPerfilUsuario();
-      this.usuarioActual.next({ logeado: true, nombre: perfil?.nombre || 'Usuario', esAdmin: perfil?.rol === 'admin' });
+      this.usuarioActual.next({ logeado: true, nombre: perfil?.nombre || 'Usuario', esAdmin: perfil?.rol === 'admin', rol: perfil?.rol ?? null });
     }
 
     return respuesta;
@@ -113,7 +114,7 @@ export class SupabaseService {
       if (dbError) return { error: dbError };
 
       // Si el registro es exitoso y el perfil se creó, actualizamos el estado
-      this.usuarioActual.next({ logeado: true, nombre: usuarioData.nombre, esAdmin: false });
+      this.usuarioActual.next({ logeado: true, nombre: usuarioData.nombre, esAdmin: false, rol: 'usuario' });
     }
 
     return { data: authData, error: null };
@@ -136,6 +137,28 @@ export class SupabaseService {
     }
 
     return data; 
+  }
+
+  async obtenerPerfilesParaGestionEmpleados() {
+    const { data, error } = await this.supabase
+      .from('perfiles')
+      .select('id, email, nombre, apellido, rol')
+      .order('nombre', { ascending: true });
+
+    if (error) throw error;
+    return data;
+  }
+
+  async actualizarRolPerfil(id: string, rol: 'usuario' | 'empleado') {
+    const { data, error } = await this.supabase
+      .from('perfiles')
+      .update({ rol })
+      .eq('id', id)
+      .select('id, rol')
+      .single();
+
+    if (error) throw error;
+    return data;
   }
 
   async actualizarPerfilUsuario(datosPerfil: {
@@ -879,15 +902,15 @@ export class SupabaseService {
   }
 
   async actualizarEstadoEntrega(idReserva: string, campo: 'entradas_retiradas' | 'candy_retirado', estado: boolean) {
-    const { data, error } = await this.supabase
-      .from('reservas')
-      .update({ [campo]: estado })
-      .eq('id', idReserva)
-      .is('cancelada_en', null)
-      .select()
-      .single();
+    if (!estado) throw new Error('No se puede revertir una entrega.');
+
+    const { data, error } = await this.supabase.rpc('marcar_entrega_reserva', {
+      p_reserva_id: idReserva,
+      p_campo: campo
+    });
 
     if (error) throw error;
+    if (!data) throw new Error('La reserva ya fue entregada, está cancelada o no existe.');
     return data;
   }
   

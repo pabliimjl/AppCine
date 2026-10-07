@@ -1,7 +1,7 @@
 {
-  "name": "App Cine",
-  "short_name": "App Cine",
-  "description": "Aplicación de gestión de cine",
+  "name": "Cine Scalas",
+  "short_name": "Cine Scalas",
+  "description": "Cartelera y reservas de Cine Scalas",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

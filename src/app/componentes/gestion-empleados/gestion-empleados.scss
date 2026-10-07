@@ -1,0 +1,160 @@
+.gestion-empleados {
+  width: min(100% - 32px, 1000px);
+  margin: 32px auto;
+  color: #f5f5f5;
+
+  .volver {
+    display: inline-block;
+    margin-bottom: 24px;
+    color: #f5f5f5;
+    text-decoration: none;
+  }
+
+  header {
+    margin-bottom: 24px;
+    border-bottom: 1px solid #454545;
+  }
+
+  h2 {
+    margin: 0 0 8px;
+    font-size: 1.7rem;
+  }
+
+  header p,
+  .estado {
+    color: #b8b8b8;
+  }
+
+  .error { color: #ff7b7b; }
+  .exito { color: #85d89c; }
+
+  .tabla-contenedor {
+    overflow-x: auto;
+  }
+
+  .busqueda {
+    display: grid;
+    grid-template-columns: minmax(180px, 1fr) minmax(220px, 2fr) auto;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+
+    label {
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    input {
+      width: 100%;
+      min-height: 40px;
+      box-sizing: border-box;
+      padding: 0 12px;
+      border: 1px solid #555;
+      border-radius: 4px;
+      background: #242426;
+      color: #fff;
+      font: inherit;
+    }
+
+    span {
+      color: #b8b8b8;
+      font-size: 0.85rem;
+      white-space: nowrap;
+    }
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+  }
+
+  th,
+  td {
+    padding: 14px 12px;
+    border-bottom: 1px solid #383838;
+  }
+
+  th {
+    color: #b8b8b8;
+    font-size: 0.82rem;
+    font-weight: 600;
+  }
+
+  .rol {
+    text-transform: capitalize;
+  }
+
+  .empleado {
+    color: #9fdaa9;
+  }
+
+  button {
+    min-height: 36px;
+    padding: 0 12px;
+    border: 1px solid #e50914;
+    border-radius: 4px;
+    background: transparent;
+    color: #fff;
+    font: inherit;
+    cursor: pointer;
+  }
+
+  button:hover:not(:disabled) {
+    background: #e50914;
+  }
+
+  button.revocar {
+    border-color: #777;
+  }
+
+  button.revocar:hover:not(:disabled) {
+    background: #555;
+  }
+
+  button:disabled {
+    cursor: wait;
+    opacity: 0.6;
+  }
+
+  .sin-usuarios {
+    padding: 28px 12px;
+    color: #b8b8b8;
+    text-align: center;
+  }
+
+  @media (max-width: 640px) {
+    .busqueda {
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+
+    thead { display: none; }
+
+    tr {
+      display: grid;
+      gap: 6px;
+      padding: 12px 0;
+      border-bottom: 1px solid #383838;
+    }
+
+    td {
+      display: grid;
+      grid-template-columns: 72px minmax(0, 1fr);
+      gap: 12px;
+      padding: 4px 8px;
+      border: 0;
+      overflow-wrap: anywhere;
+    }
+
+    td::before {
+      content: attr(data-label);
+      color: #b8b8b8;
+      font-size: 0.8rem;
+    }
+
+    .sin-usuarios {
+      display: block;
+    }
+  }
+}

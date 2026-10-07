@@ -11,5 +11,5 @@ import { Footer } from './componentes/footer/footer'; // Ajusta la ruta
   styleUrls: ['./app.scss']
 })
 export class App {
-  title = 'app-cine';
+  title = 'Cine Scalas';
 }

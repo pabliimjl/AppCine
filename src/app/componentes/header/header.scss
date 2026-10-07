@@ -12,6 +12,29 @@
     align-items: center;
   }
 
+  .header-right {
+    position: relative;
+  }
+
+  .logo-inicio {
+    display: inline-flex;
+    align-items: center;
+    flex: 0 0 auto;
+
+    img {
+      display: block;
+      width: auto;
+      height: 48px;
+      object-fit: contain;
+    }
+  }
+
+  .opciones-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
   .usuario-logueado,
   .invitado-bloque {
     display: flex;
@@ -53,6 +76,10 @@
     }
   }
 
+  .menu-toggle {
+    display: none;
+  }
+
   .saludo {
     color: #e5e5e5;
     font-weight: 500;
@@ -64,19 +91,93 @@
   }
 }
 
-@media (max-width: 560px) {
+@media (max-width: 700px) {
   .app-header {
     padding: 0.85rem 1rem;
 
+    .logo-inicio img {
+      height: 40px;
+    }
+
+    .menu-toggle {
+      display: grid;
+      place-content: center;
+      gap: 5px;
+      width: 44px;
+      height: 44px;
+      padding: 10px;
+      border: 1px solid #454545;
+      border-radius: 4px;
+      background: transparent;
+      cursor: pointer;
+
+      span {
+        display: block;
+        width: 21px;
+        height: 2px;
+        border-radius: 2px;
+        background: #fff;
+        transition: transform 0.2s ease, opacity 0.2s ease;
+      }
+    }
+
+    .menu-abierto .menu-toggle span:first-child {
+      transform: translateY(7px) rotate(45deg);
+    }
+
+    .menu-abierto .menu-toggle span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .menu-abierto .menu-toggle span:last-child {
+      transform: translateY(-7px) rotate(-45deg);
+    }
+
+    .opciones-header {
+      position: absolute;
+      z-index: 20;
+      top: calc(100% + 12px);
+      right: 0;
+      display: none;
+      width: min(88vw, 320px);
+      padding: 12px;
+      border: 1px solid #333;
+      background: #0f1014;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
+    }
+
+    .menu-abierto .opciones-header {
+      display: flex;
+      align-items: stretch;
+      flex-direction: column;
+      gap: 6px;
+    }
+
     .usuario-logueado,
     .invitado-bloque {
-      flex-wrap: wrap;
-      justify-content: flex-end;
-      gap: 0.65rem;
+      align-items: stretch;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .saludo,
+    .texto-invitado {
+      padding: 10px 8px;
+    }
+
+    .btn-cartelera,
+    .enlace-perfil,
+    .btn-login,
+    .btn-cerrar,
+    .btn-admin,
+    .btn-validar-qr {
+      width: 100%;
+      box-sizing: border-box;
+      justify-content: flex-start;
+      padding: 0 8px;
     }
 
     .saludo {
-      max-width: 140px;
       overflow-wrap: anywhere;
     }
   }

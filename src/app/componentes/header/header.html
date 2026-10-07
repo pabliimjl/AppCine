@@ -1,31 +1,42 @@
 <header class="app-header">
   <div class="header-left">
-    <a class="btn-cartelera" routerLink="/" routerLinkActive="activo" [routerLinkActiveOptions]="{ exact: true }" *ocultarEnRutas="['/']">
-      Cartelera
+    <a class="logo-inicio" routerLink="/" aria-label="Cine App - inicio">
+      <img src="/img/logo.png" alt="Cine App">
     </a>
   </div>
 
-  <div class="header-right" *ocultarEnRutas="['/login', '/registro']">
-    
-    <!-- Nuevo Control Flow de Angular -->
-    @if (estaLogeado()) {
-      
-      <div class="usuario-logueado">
-        <span class="saludo">¡Bienvenido, {{ nombreUsuario() }}!</span>
-        <a class="enlace-perfil" routerLink="/perfil" routerLinkActive="activo">Mi Perfil</a>
-        <a *requiereAdmin class="btn-admin" routerLink="/admin" routerLinkActive="activo">Admin</a>
-        <a *requiereAdmin class="btn-validar-qr" routerLink="/verificador" routerLinkActive="activo">Validar QR</a>
-        <button class="btn-cerrar" (click)="cerrarSesion()">Salir</button>
-      </div>
-      
-    } @else {
-      
-      <div class="invitado-bloque">
-        <span class="texto-invitado">Usted está en modo invitado</span>
-        <button class="btn-login" routerLink="/login" routerLinkActive="activo">Iniciar Sesión</button>
-      </div>
+  <div class="header-right" [class.menu-abierto]="menuAbierto()" *ocultarEnRutas="['/login', '/registro']">
+    <button
+      class="menu-toggle"
+      type="button"
+      [attr.aria-expanded]="menuAbierto()"
+      [attr.aria-label]="menuAbierto() ? 'Cerrar menú' : 'Abrir menú'"
+      aria-controls="opciones-header"
+      (click)="alternarMenu()">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
 
-    }
-
+    <nav id="opciones-header" class="opciones-header">
+      <a class="btn-cartelera" routerLink="/" routerLinkActive="activo" [routerLinkActiveOptions]="{ exact: true }" *ocultarEnRutas="['/']" (click)="cerrarMenu()">
+        Cartelera
+      </a>
+      @if (estaLogeado()) {
+        <div class="usuario-logueado">
+          <span class="saludo">¡Bienvenido, {{ nombreUsuario() }}!</span>
+          <a class="enlace-perfil" routerLink="/perfil" routerLinkActive="activo" (click)="cerrarMenu()">Mi Perfil</a>
+          <a *ngIf="esAdmin()" class="btn-admin" routerLink="/admin" routerLinkActive="activo" (click)="cerrarMenu()">Admin</a>
+          <a *ngIf="esEmpleado()" class="btn-admin" routerLink="/empleado" routerLinkActive="activo" (click)="cerrarMenu()">Empleado</a>
+          <a *ngIf="esAdmin() || esEmpleado()" class="btn-validar-qr" [routerLink]="esEmpleado() ? '/empleado/verificador' : '/verificador'" routerLinkActive="activo" (click)="cerrarMenu()">Validar QR</a>
+          <button class="btn-cerrar" (click)="cerrarSesion()">Salir</button>
+        </div>
+      } @else {
+        <div class="invitado-bloque">
+          <span class="texto-invitado">Usted está en modo invitado</span>
+          <a class="btn-login" routerLink="/login" routerLinkActive="activo" (click)="cerrarMenu()">Iniciar Sesión</a>
+        </div>
+      }
+    </nav>
   </div>
 </header>

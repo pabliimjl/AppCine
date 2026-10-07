@@ -24,10 +24,13 @@ create table if not exists public.perfiles (
   tipo_sangre text not null,
   color_ojos text not null,
   dias_vacaciones integer not null default 0 check (dias_vacaciones between 0 and 365),
-  rol text not null default 'usuario' check (rol in ('usuario', 'admin')),
+  rol text not null default 'usuario' check (rol in ('usuario', 'admin', 'empleado')),
   creditos numeric(12, 2) not null default 0 check (creditos >= 0),
   puntos numeric(14, 2) not null default 0 check (puntos >= 0)
 );
+
+alter table public.perfiles drop constraint if exists perfiles_rol_check;
+alter table public.perfiles add constraint perfiles_rol_check check (rol in ('usuario', 'admin', 'empleado'));
 
 create table if not exists public.peliculas (
   id uuid primary key default gen_random_uuid(),
@@ -231,6 +234,23 @@ $$;
 revoke all on function public.es_admin() from public, anon;
 grant execute on function public.es_admin() to authenticated;
 
+create or replace function public.es_empleado_o_admin()
+returns boolean
+language sql
+stable
+security definer
+set search_path = public, pg_temp
+set row_security = off
+as $$
+  select exists (
+    select 1 from public.perfiles
+    where id = auth.uid() and rol in ('admin', 'empleado')
+  );
+$$;
+
+revoke all on function public.es_empleado_o_admin() from public, anon;
+grant execute on function public.es_empleado_o_admin() to authenticated;
+
 alter table public.perfiles enable row level security;
 alter table public.peliculas enable row level security;
 alter table public.salas enable row level security;
@@ -253,7 +273,8 @@ alter table public.log_auditoria enable row level security;
 drop policy if exists peliculas_lectura_publica on public.peliculas;
 create policy peliculas_lectura_publica on public.peliculas for select to anon, authenticated using (true);
 drop policy if exists peliculas_admin_gestiona on public.peliculas;
-create policy peliculas_admin_gestiona on public.peliculas for all to authenticated using (public.es_admin()) with check (public.es_admin());
+drop policy if exists peliculas_personal_gestiona on public.peliculas;
+create policy peliculas_personal_gestiona on public.peliculas for all to authenticated using (public.es_empleado_o_admin()) with check (public.es_empleado_o_admin());
 
 drop policy if exists salas_lectura_publica on public.salas;
 create policy salas_lectura_publica on public.salas for select to anon, authenticated using (true);
@@ -268,28 +289,32 @@ create policy funciones_admin_gestiona on public.funciones for all to authentica
 drop policy if exists candy_categorias_lectura_publica on public.candy_categorias;
 create policy candy_categorias_lectura_publica on public.candy_categorias for select to anon, authenticated using (true);
 drop policy if exists candy_categorias_admin_gestiona on public.candy_categorias;
-create policy candy_categorias_admin_gestiona on public.candy_categorias for all to authenticated using (public.es_admin()) with check (public.es_admin());
+drop policy if exists candy_categorias_personal_gestiona on public.candy_categorias;
+create policy candy_categorias_personal_gestiona on public.candy_categorias for all to authenticated using (public.es_empleado_o_admin()) with check (public.es_empleado_o_admin());
 
 drop policy if exists candy_productos_lectura_publica on public.candy_productos;
 create policy candy_productos_lectura_publica on public.candy_productos for select to anon, authenticated using (true);
 drop policy if exists candy_productos_admin_gestiona on public.candy_productos;
-create policy candy_productos_admin_gestiona on public.candy_productos for all to authenticated using (public.es_admin()) with check (public.es_admin());
+drop policy if exists candy_productos_personal_gestiona on public.candy_productos;
+create policy candy_productos_personal_gestiona on public.candy_productos for all to authenticated using (public.es_empleado_o_admin()) with check (public.es_empleado_o_admin());
 
 drop policy if exists candy_combos_lectura_publica on public.candy_combos;
 create policy candy_combos_lectura_publica on public.candy_combos for select to anon, authenticated using (true);
 drop policy if exists candy_combos_admin_gestiona on public.candy_combos;
-create policy candy_combos_admin_gestiona on public.candy_combos for all to authenticated using (public.es_admin()) with check (public.es_admin());
+drop policy if exists candy_combos_personal_gestiona on public.candy_combos;
+create policy candy_combos_personal_gestiona on public.candy_combos for all to authenticated using (public.es_empleado_o_admin()) with check (public.es_empleado_o_admin());
 
 drop policy if exists candy_combo_items_lectura_publica on public.candy_combo_items;
 create policy candy_combo_items_lectura_publica on public.candy_combo_items for select to anon, authenticated using (true);
 drop policy if exists candy_combo_items_admin_gestiona on public.candy_combo_items;
-create policy candy_combo_items_admin_gestiona on public.candy_combo_items for all to authenticated using (public.es_admin()) with check (public.es_admin());
+drop policy if exists candy_combo_items_personal_gestiona on public.candy_combo_items;
+create policy candy_combo_items_personal_gestiona on public.candy_combo_items for all to authenticated using (public.es_empleado_o_admin()) with check (public.es_empleado_o_admin());
 
 -- Cada perfil puede consultar su fila. Los perfiles nuevos no pueden asignarse rol admin.
 drop policy if exists perfiles_consulta_propia_o_admin on public.perfiles;
 create policy perfiles_consulta_propia_o_admin on public.perfiles for select to authenticated using (id = auth.uid() or public.es_admin());
 drop policy if exists perfiles_registro_propio on public.perfiles;
-create policy perfiles_registro_propio on public.perfiles for insert to authenticated with check (id = auth.uid() and rol <> 'admin');
+create policy perfiles_registro_propio on public.perfiles for insert to authenticated with check (id = auth.uid() and rol = 'usuario');
 drop policy if exists perfiles_admin_gestiona on public.perfiles;
 create policy perfiles_admin_gestiona on public.perfiles for all to authenticated using (public.es_admin()) with check (public.es_admin());
 
@@ -303,6 +328,37 @@ create policy reservas_creacion_app on public.reservas for insert to anon, authe
 );
 drop policy if exists reservas_admin_actualiza on public.reservas;
 create policy reservas_admin_actualiza on public.reservas for update to authenticated using (public.es_admin()) with check (public.es_admin());
+
+create or replace function public.marcar_entrega_reserva(p_reserva_id uuid, p_campo text)
+returns boolean
+language plpgsql
+security definer
+set search_path = public, pg_temp
+set row_security = off
+as $$
+begin
+  if auth.uid() is null or not public.es_empleado_o_admin() then
+    raise exception 'Se requieren permisos de empleado o administrador.';
+  end if;
+
+  if p_campo = 'entradas_retiradas' then
+    update public.reservas
+    set entradas_retiradas = true
+    where id = p_reserva_id and cancelada_en is null and not entradas_retiradas;
+  elsif p_campo = 'candy_retirado' then
+    update public.reservas
+    set candy_retirado = true
+    where id = p_reserva_id and cancelada_en is null and not candy_retirado;
+  else
+    raise exception 'Campo de entrega no válido.';
+  end if;
+
+  return found;
+end;
+$$;
+
+revoke all on function public.marcar_entrega_reserva(uuid, text) from public, anon;
+grant execute on function public.marcar_entrega_reserva(uuid, text) to authenticated;
 
 drop policy if exists reserva_asientos_lectura_app on public.reserva_asientos;
 create policy reserva_asientos_lectura_app on public.reserva_asientos for select to anon, authenticated using (true);
@@ -882,7 +938,7 @@ on conflict (id) do update set public = excluded.public;
 drop policy if exists imagenes_lectura_publica on storage.objects;
 create policy imagenes_lectura_publica on storage.objects for select to anon, authenticated using (bucket_id = 'imagenes');
 drop policy if exists imagenes_admin_inserta on storage.objects;
-create policy imagenes_admin_inserta on storage.objects for insert to authenticated with check (bucket_id = 'imagenes' and public.es_admin());
+create policy imagenes_admin_inserta on storage.objects for insert to authenticated with check (bucket_id = 'imagenes' and public.es_empleado_o_admin());
 drop policy if exists imagenes_admin_actualiza on storage.objects;
 create policy imagenes_admin_actualiza on storage.objects for update to authenticated using (bucket_id = 'imagenes' and public.es_admin()) with check (bucket_id = 'imagenes' and public.es_admin());
 drop policy if exists imagenes_admin_elimina on storage.objects;

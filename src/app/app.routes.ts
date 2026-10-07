@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { adminGuard } from './guards/admin-guard';
+import { empleadoGuard, personalGuard } from './guards/empleado-guard';
 import { sessionGuard } from './guards/session-guard';
 import { PagoComponent } from './componentes/pago/pago';
 
@@ -28,6 +29,7 @@ export const routes: Routes = [
   },
   {
     path: 'verificador',
+    canActivate: [personalGuard],
     loadComponent: () => import('./componentes/verificador/verificador').then(m => m.VerificadorComponent)
   },
   {
@@ -76,7 +78,43 @@ export const routes: Routes = [
         path: 'log',
         loadComponent: () => import('./componentes/gestionar-log/gestionar-log').then(m => m.GestionarLogComponent),
         title: 'Gestionar log'
-      }   
+      },
+      {
+        path: 'empleados',
+        loadComponent: () => import('./componentes/gestion-empleados/gestion-empleados').then(m => m.GestionEmpleadosComponent),
+        title: 'Gestionar empleados'
+      },
+      {
+        path: 'salas',
+        loadComponent: () => import('./componentes/gestion-salas/gestion-salas').then(m => m.GestionSalasComponent),
+        title: 'Gestionar salas'
+      }
+    ]
+  },
+  {
+    path: 'empleado',
+    canActivate: [empleadoGuard],
+    children: [
+      {
+        path: '',
+        loadComponent: () => import('./componentes/admin-dashboard/admin-dashboard').then(m => m.AdminDashboard),
+        title: 'Panel de empleado'
+      },
+      {
+        path: 'peliculas',
+        loadComponent: () => import('./componentes/panel-admin/panel-admin').then(m => m.AdminPanel),
+        title: 'Gestionar películas'
+      },
+      {
+        path: 'candy',
+        loadComponent: () => import('./componentes/candy-admin/candy-admin').then(m => m.CandyAdminComponent),
+        title: 'Gestionar Candy Bar'
+      },
+      {
+        path: 'verificador',
+        loadComponent: () => import('./componentes/verificador/verificador').then(m => m.VerificadorComponent),
+        title: 'Leer códigos QR'
+      }
     ]
   },
   { 

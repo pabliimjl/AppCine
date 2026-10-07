@@ -40,24 +40,31 @@
     </div>
   
     <div class="filtro-multiple-contenedor">
-    <span class="titulo-filtro">Filtrar por géneros:</span>
-    
-    <div class="chips-contenedor">
-      <button 
-        class="chip chip-limpiar" 
-        *ngIf="generosSeleccionados.length > 0"
-        (click)="generosSeleccionados = []; aplicarFiltroMultiple()">
-        ✕ Limpiar filtros
-      </button>
-
-      <button 
-        *ngFor="let genero of conteoGeneros | keyvalue" 
-        class="chip"
-        [class.activo]="generosSeleccionados.includes(genero.key)"
-        (click)="toggleGenero(genero.key)">
-        {{ genero.key }} 
-      </button>
-    </div>
+      <label class="titulo-filtro" id="etiqueta-filtro-generos">Filtrar por géneros</label>
+      <details class="desplegable-generos">
+        <summary aria-labelledby="etiqueta-filtro-generos">
+          <span>{{ etiquetaGenerosSeleccionados() }}</span>
+          <span class="flecha-desplegable" aria-hidden="true"></span>
+        </summary>
+        <div class="opciones-generos">
+          <button
+            type="button"
+            class="limpiar-generos"
+            *ngIf="generosSeleccionados.length > 0"
+            (click)="generosSeleccionados = []; aplicarFiltroMultiple()">
+            Limpiar selección
+          </button>
+          <label class="opcion-genero" *ngFor="let genero of conteoGeneros | keyvalue">
+            <input
+              type="checkbox"
+              [checked]="generosSeleccionados.includes(genero.key)"
+              (change)="toggleGenero(genero.key)">
+            <span>{{ genero.key }}</span>
+            <span class="conteo-genero">{{ genero.value }}</span>
+          </label>
+          <p class="sin-generos" *ngIf="(conteoGeneros | keyvalue).length === 0">No hay géneros disponibles.</p>
+        </div>
+      </details>
   </div>
 
   

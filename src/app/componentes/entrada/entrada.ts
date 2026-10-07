@@ -75,9 +75,11 @@ export class EntradaComponent implements OnInit {
       this.enviandoEmail.set(false);
     }
   }
+
   volverAlInicio() {
     this.router.navigate(['/cartelera']);
   }
+  
   async cargarDetallesReserva(){
     return await this.supabaseService.obtenerDetallesReservaPorId(this.nroReserva())
   }

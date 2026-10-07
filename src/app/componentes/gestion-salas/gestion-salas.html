@@ -1,0 +1,63 @@
+<main class="gestion-salas">
+  <a routerLink="/admin" class="volver">← Volver al panel</a>
+  <header>
+    <h2>Gestionar salas</h2>
+    <p>Administra las salas disponibles para programar funciones.</p>
+  </header>
+
+  <p class="estado error" role="alert" *ngIf="mensajeError()">{{ mensajeError() }}</p>
+  <p class="estado exito" role="status" *ngIf="mensajeExito()">{{ mensajeExito() }}</p>
+
+  <section class="formulario-sala" aria-labelledby="titulo-nueva-sala">
+    <h3 id="titulo-nueva-sala">Agregar sala</h3>
+    <form [formGroup]="salaForm" (ngSubmit)="agregarSala()">
+      <div class="campo">
+        <label for="nombre-sala">Nombre</label>
+        <input id="nombre-sala" type="text" formControlName="nombre" maxlength="100" placeholder="Ej. Sala 1">
+        <small *ngIf="salaForm.controls.nombre.touched && salaForm.controls.nombre.hasError('required')">Ingresa el nombre de la sala.</small>
+      </div>
+      <div class="campo capacidad">
+        <label for="capacidad-sala">Capacidad</label>
+        <input id="capacidad-sala" type="number" formControlName="capacidad" min="1" max="1000">
+        <small *ngIf="salaForm.controls.capacidad.touched && salaForm.controls.capacidad.invalid">Ingresa un número entre 1 y 1000.</small>
+      </div>
+      <button type="submit" [disabled]="guardando()">
+        {{ guardando() ? 'Guardando...' : 'Agregar sala' }}
+      </button>
+    </form>
+  </section>
+
+  <section class="lista-salas" aria-labelledby="titulo-salas">
+    <h3 id="titulo-salas">Salas registradas <span>{{ salas().length }}</span></h3>
+    <p class="estado" *ngIf="cargando()">Cargando salas...</p>
+    <div class="tabla-contenedor" *ngIf="!cargando()">
+      <table *ngIf="salas().length > 0; else sinSalas">
+        <thead>
+          <tr>
+            <th scope="col">Nombre</th>
+            <th scope="col">Capacidad</th>
+            <th scope="col">Acción</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let sala of salas()">
+            <td data-label="Nombre">{{ sala.nombre }}</td>
+            <td data-label="Capacidad">{{ sala.capacidad }} butacas</td>
+            <td data-label="Acción">
+              <button
+                type="button"
+                class="quitar"
+                [disabled]="eliminandoId() !== null"
+                (click)="quitarSala(sala)">
+                {{ eliminandoId() === sala.id ? 'Quitando...' : 'Quitar sala' }}
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <ng-template #sinSalas>
+        <p class="sin-salas">Todavía no hay salas registradas.</p>
+      </ng-template>
+    </div>
+  </section>
+</main>

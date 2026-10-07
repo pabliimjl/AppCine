@@ -1,8 +1,8 @@
 <div class="dashboard-contenedor">
-  <h2>Panel de Control - Administración</h2>
-  <p class="subtitulo">Selecciona una sección para gestionar el contenido del cine.</p>
+  <h2>{{ esAdmin() ? 'Panel de Control - Administración' : 'Panel de empleado' }}</h2>
+  <p class="subtitulo">{{ esAdmin() ? 'Selecciona una sección para gestionar el contenido del cine.' : 'Gestiona películas, Candy Bar y validación de accesos.' }}</p>
 
-  <div class="metricas-grid">
+  <div class="metricas-grid" *ngIf="esAdmin()">
     <div class="metrica-card">
       <span class="numero">{{ totalPeliculas() }}</span>
       <span class="etiqueta">Películas</span>
@@ -21,7 +21,7 @@
     </div>
   </div>
 
-  <section class="metricas-ventas" aria-labelledby="titulo-metricas-ventas">
+  <section class="metricas-ventas" aria-labelledby="titulo-metricas-ventas" *ngIf="esAdmin()">
     <div class="encabezado-seccion">
       <div>
         <h3 id="titulo-metricas-ventas">Rendimiento de ventas</h3>
@@ -95,7 +95,7 @@
   </section>
 
   <div class="acciones-grid">
-    <a routerLink="/admin/peliculas" class="accion-card peliculas">
+    <a [routerLink]="rutaBase() + '/peliculas'" class="accion-card peliculas">
       <div class="icono">🎬</div>
       <div class="info">
         <h3>Gestionar Películas</h3>
@@ -103,7 +103,7 @@
       </div>
     </a>
 
-    <a routerLink="/admin/funciones" class="accion-card funciones">
+    <a *ngIf="esAdmin()" routerLink="/admin/funciones" class="accion-card funciones">
       <div class="icono">📅</div>
       <div class="info">
         <h3>Gestionar Funciones</h3>
@@ -111,7 +111,7 @@
       </div>
     </a>
 
-    <a routerLink="/admin/candy" class="accion-card candy">
+    <a [routerLink]="rutaBase() + '/candy'" class="accion-card candy">
       <div class="icono">🍿</div>
       <div class="info">
         <h3>Gestionar Candy Bar</h3>
@@ -119,7 +119,7 @@
       </div>
     </a>
 
-    <a routerLink="/admin/cupones" class="accion-card cupones">
+    <a *ngIf="esAdmin()" routerLink="/admin/cupones" class="accion-card cupones">
       <div class="icono">🏷️</div>
       <div class="info">
         <h3>Gestionar cupones y descuentos</h3>
@@ -127,11 +127,35 @@
       </div>
     </a>
 
-    <a routerLink="/admin/log" class="accion-card log">
+    <a *ngIf="esAdmin()" routerLink="/admin/log" class="accion-card log">
       <div class="icono">≡</div>
       <div class="info">
         <h3>Gestionar log</h3>
         <p>Consultar las acciones registradas en el sistema por periodo.</p>
+      </div>
+    </a>
+
+    <a [routerLink]="esAdmin() ? '/verificador' : '/empleado/verificador'" class="accion-card verificador">
+      <div class="icono">▦</div>
+      <div class="info">
+        <h3>Leer códigos QR</h3>
+        <p>Validar entradas y registrar entregas de Candy Bar.</p>
+      </div>
+    </a>
+
+    <a *ngIf="esAdmin()" routerLink="/admin/empleados" class="accion-card empleados">
+      <div class="icono">♙</div>
+      <div class="info">
+        <h3>Gestionar empleados</h3>
+        <p>Asignar o quitar el rol de empleado a usuarios registrados.</p>
+      </div>
+    </a>
+
+    <a *ngIf="esAdmin()" routerLink="/admin/salas" class="accion-card salas">
+      <div class="icono">▤</div>
+      <div class="info">
+        <h3>Gestionar salas</h3>
+        <p>Agregar salas al cine o quitar las que ya no se utilizan.</p>
       </div>
     </a>
   </div>

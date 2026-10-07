@@ -2,7 +2,7 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { SupabaseService } from '../../servicios/supabase';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-candy-admin',
@@ -15,6 +15,7 @@ import { RouterLink } from '@angular/router';
 export class CandyAdminComponent implements OnInit {
   private fb = inject(FormBuilder);
   private supabaseService = inject(SupabaseService);
+  rutaVolver = inject(Router).url.startsWith('/empleado') ? '/empleado' : '/admin';
 
   pestanaActiva = signal<string>('productos');
 

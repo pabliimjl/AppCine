@@ -75,14 +75,20 @@ export class Cartelera implements OnInit {
     
     this.aplicarFiltroMultiple();
   }
-// NUEVO: Captura lo que el usuario escribe
+
+  etiquetaGenerosSeleccionados(): string {
+    if (this.generosSeleccionados.length === 0) return 'Todos los géneros';
+    if (this.generosSeleccionados.length === 1) return this.generosSeleccionados[0];
+    return `${this.generosSeleccionados.length} géneros seleccionados`;
+  }
+
   actualizarBusqueda(event: Event) {
     const input = event.target as HTMLInputElement;
     this.terminoBusqueda = input.value;
     this.aplicarFiltros();
   }
 
-  // MODIFICADO: Reemplaza tu método aplicarFiltroMúltiple con este
+ 
   aplicarFiltros() {
     // 1. Partimos de todas las películas del día
     let filtradas = [...this.peliculasDelDia];

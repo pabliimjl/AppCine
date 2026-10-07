@@ -1,4 +1,4 @@
-# AppCine
+# Cine Scalas
 
 Aplicación web desarrollada como trabajo práctico de la asignatura **Programación IV**, correspondiente a la **Tecnicatura Universitaria en Programación** de la **Universidad Tecnológica Nacional, Facultad Regional Avellaneda**.
 

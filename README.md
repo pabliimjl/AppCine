@@ -82,6 +82,411 @@ El acceso a `/admin` requiere una cuenta cuyo perfil tenga el rol `admin` en Sup
 
 El **Registro de auditoría** muestra las operaciones ocurridas dentro del periodo seleccionado, con fecha y hora, usuario, acción, entidad afectada y una referencia descriptiva. Los resultados se consultan en páginas de 100 registros hasta completar el periodo, sin un límite total de 100 operaciones. Los triggers de PostgreSQL registran altas, modificaciones y eliminaciones en entidades de administración, perfiles, reseñas, compras, reservas de butacas y Candy Bar, además de movimientos de créditos y puntos. El log no conserva contraseñas ni copias completas de las filas. La política RLS permite consultarlo únicamente a perfiles con rol `admin`.
 
+### Diagrama de flujo
+
+```mermaid
+flowchart TD
+    Inicio([Abrir Cine Scalas]) --> Sesion[Restaurar sesión de Supabase]
+    Sesion --> Entrada{¿Qué desea hacer?}
+
+    Entrada -->|Explorar o comprar| Cartelera[Ver cartelera]
+    Cartelera --> Filtros[Filtrar por fecha, título o género]
+    Filtros --> Funcion[Seleccionar película y horario]
+    Funcion --> Reserva[Elegir cantidad de entradas por tipo]
+    Reserva --> Cantidad{¿Seleccionó al menos una entrada?}
+    Cantidad -->|No| Reserva
+    Cantidad -->|Sí| Butacas[Abrir selección de butacas]
+
+    Butacas --> Cargar[Consultar bloqueos vigentes y asientos vendidos]
+    Cargar --> Elegir[Seleccionar una butaca]
+    Elegir --> Bloquear[Solicitar bloqueo atómico a Supabase]
+    Bloquear --> Disponible{¿Se pudo bloquear?}
+    Disponible -->|No: otro usuario la tomó| Recargar[Actualizar mapa de butacas]
+    Recargar --> Elegir
+    Disponible -->|Sí| ActualizarMapa[Marcar butaca como seleccionada]
+    ActualizarMapa --> Realtime[Escuchar cambios Realtime de esta función]
+    Realtime --> SeleccionCompleta{¿Coinciden las butacas con las entradas elegidas?}
+    SeleccionCompleta -->|No| Elegir
+    SeleccionCompleta -->|Sí| Tiempo{¿Sigue vigente el bloqueo de 5 minutos?}
+    Tiempo -->|No| Expirada[Volver a cartelera; los bloqueos vencidos dejan de contar como ocupados]
+    Expirada --> Cartelera
+    Tiempo -->|Sí| Candy[Revisar productos y combos Candy]
+    Candy --> Pago[Calcular total, descuentos y créditos disponibles]
+    Pago --> Medio{¿Cómo paga?}
+
+    Medio -->|Créditos total o parcial| RPC[Ejecutar comprar_con_creditos]
+    Medio -->|Tarjeta o Mercado Pago| Externo[Validar formulario y registrar compra]
+    RPC --> Compra{¿Supabase confirmó la compra?}
+    Externo --> Compra
+    Compra -->|No| ErrorPago[Mostrar error y permitir reintento]
+    ErrorPago --> Pago
+    Compra -->|Sí| Guardar[Guardar reserva, asientos y productos Candy]
+    Guardar --> Soltar[Eliminar bloqueos temporales de la sesión]
+    Soltar --> Ticket[Mostrar entrada y QR de la reserva]
+    Ticket --> Email{¿Solicita envío por email?}
+    Email -->|Sí| Enviar[Invocar función de envío de ticket]
+    Email -->|No| FinCompra([Fin])
+    Enviar --> FinCompra
+
+    Entrada -->|Iniciar sesión| Login[Autenticar con Supabase]
+    Login --> Perfil[Consultar perfil y rol]
+    Perfil --> Rol{¿Qué rol tiene?}
+
+    Rol -->|Admin| SolicitarAdmin[/Entrar a admin/]
+    SolicitarAdmin --> AdminGuard{¿adminGuard confirma rol admin?}
+    AdminGuard -->|No| DenegarAdmin[Denegar y volver a cartelera]
+    AdminGuard -->|Sí| PanelAdmin[/Panel admin/]
+    PanelAdmin --> GestionAdmin[Gestionar películas, funciones, Candy, salas, empleados, cupones y auditoría]
+    PanelAdmin --> Metricas[Consultar métricas y exportar reportes]
+    PanelAdmin --> QRAdmin[Abrir verificador QR]
+
+    Rol -->|Empleado| SolicitarEmpleado[/Entrar a empleado/]
+    SolicitarEmpleado --> EmpleadoGuard{¿empleadoGuard confirma rol empleado?}
+    EmpleadoGuard -->|No| DenegarEmpleado[Denegar y volver a cartelera]
+    EmpleadoGuard -->|Sí| PanelEmpleado[/Panel empleado/]
+    PanelEmpleado --> GestionEmpleado[Gestionar películas y Candy]
+    PanelEmpleado --> QREmpleado[Abrir verificador QR]
+
+    Rol -->|Usuario| PerfilUsuario[/Abrir perfil/]
+    PerfilUsuario --> AccionesPerfil[Consultar compras, créditos, puntos y reseñas]
+    AccionesPerfil --> Canjear[Canjear puntos o cancelar compra con créditos]
+
+    QRAdmin --> LeerQR[Escanear QR o ingresar UUID de reserva]
+    QREmpleado --> LeerQR
+    LeerQR --> ReservaValida{¿Existe y no está cancelada?}
+    ReservaValida -->|No| QRInvalido[Mostrar error]
+    ReservaValida -->|Sí| TipoEntrega{¿Qué se entrega?}
+    TipoEntrega -->|Entrada| MarcarEntrada[Marcar entradas_retiradas]
+    TipoEntrega -->|Candy| MarcarCandy[Marcar candy_retirado]
+    MarcarEntrada --> RPCEntrega[RPC valida rol y actualiza sólo el campo permitido]
+    MarcarCandy --> RPCEntrega
+    RPCEntrega --> EntregaLista[Actualizar estado visible de la reserva]
+```
+
+## Diagrama de clases
+
+```mermaid
+classDiagram
+direction LR
+
+class App {
+  +Header header
+  +Footer footer
+}
+class Header {
+  +estadoUsuario
+  +menuAbierto
+  +cerrarSesion()
+}
+class Footer
+
+class SupabaseService {
+  +estadoUsuario$
+  +login(email, password)
+  +registrarUsuario(datos, password)
+  +cerrarSesion()
+  +obtenerPerfilUsuario()
+  +actualizarPerfilUsuario(datos)
+  +obtenerPeliculasEnCartelera()
+  +obtenerDetalleFuncion(funcionId)
+  +obtenerMenuCandy()
+  +intentarBloquearButaca(funcionId, butacaId, sesionId)
+  +liberarButaca(funcionId, butacaId, sesionId)
+  +liberarButacasDeSesion(funcionId, sesionId)
+  +suscribirseCambiosButacas(funcionId, callback)
+  +guardarCompraDefinitiva(datos)
+  +guardarCompraConCreditos(datos)
+  +cancelarCompraPorCreditos(reservaId)
+  +canjearPuntosPorCreditos(puntos)
+  +guardarResenaPelicula(datos)
+  +obtenerMetricasAdministrador(periodo)
+  +obtenerAuditoriaAdministrador(dias)
+  +actualizarEstadoEntrega(reservaId, campo, estado)
+  +subirImagen(archivo, carpeta)
+  +enviarTicketPorEmail(reservaId)
+}
+
+class Cartelera {
+  +seleccionarDia(fecha)
+  +actualizarBusqueda(texto)
+  +toggleGenero(genero)
+  +seleccionarPrimeraFuncion(peliculaId)
+}
+class EstrenosComponent
+class ReservaComponent {
+  +cambiarCantidad(tipo, incremento)
+  +confirmarCompra()
+}
+class SeleccionButacasComponent {
+  +funcionId
+  +sesionId
+  +tiempoRestante
+  +toggleAsiento(asiento)
+  +iniciarTemporizador()
+  +continuarAlCandy()
+  +cancelarCompra()
+}
+class CandyComponent {
+  +carrito
+  +continuarAlPago()
+  +volverAButacas()
+  +cancelarCompra()
+}
+class PagoComponent {
+  +metodoPago
+  +totalPagar
+  +importeDescuento
+  +estadoPago
+}
+class EntradaComponent {
+  +reservaId
+  +mostrarQR()
+  +enviarPorEmail()
+}
+class PerfilUsuarioComponent {
+  +obtenerCompras()
+  +canjearPuntos()
+  +cancelarCompra()
+  +guardarResena()
+}
+class VerificadorComponent {
+  +buscarReserva()
+  +onCodigoEscaneado(codigo)
+  +alternarEstado(campo)
+}
+class AdminDashboard {
+  +esAdmin
+  +cargarMetricas()
+  +exportarPdf()
+  +exportarExcel()
+}
+class AdminPanel
+class FuncionesAdminComponent
+class CandyAdminComponent
+class GestionEmpleadosComponent {
+  +busqueda
+  +cargarPerfiles()
+  +cambiarRol(perfil)
+}
+class GestionSalasComponent {
+  +cargarSalas()
+  +agregarSala()
+  +quitarSala(sala)
+}
+class GestionarCuponesComponent
+class GestionarLogComponent
+
+class SessionGuard
+class AdminGuard
+class EmpleadoGuard
+class PersonalGuard
+
+App *-- Header
+App *-- Footer
+
+Cartelera ..> SupabaseService
+Cartelera ..> EstrenosComponent
+ReservaComponent ..> SupabaseService
+SeleccionButacasComponent ..> SupabaseService : bloqueos y Realtime
+CandyComponent ..> SupabaseService
+PagoComponent ..> SupabaseService
+EntradaComponent ..> SupabaseService
+PerfilUsuarioComponent ..> SupabaseService
+VerificadorComponent ..> SupabaseService
+AdminDashboard ..> SupabaseService
+AdminPanel ..> SupabaseService
+FuncionesAdminComponent ..> SupabaseService
+CandyAdminComponent ..> SupabaseService
+GestionEmpleadosComponent ..> SupabaseService
+GestionSalasComponent ..> SupabaseService
+GestionarCuponesComponent ..> SupabaseService
+GestionarLogComponent ..> SupabaseService
+
+SessionGuard ..> SupabaseService : requiere sesión
+AdminGuard ..> SupabaseService : rol admin
+EmpleadoGuard ..> SupabaseService : rol empleado
+PersonalGuard ..> SupabaseService : admin o empleado
+
+class Rol {
+  <<enumeration>>
+  usuario
+  admin
+  empleado
+}
+class AuthUser {
+  +UUID id
+  +string email
+}
+class Perfil {
+  +UUID id
+  +string email
+  +string nombre
+  +string apellido
+  +date fechaNacimiento
+  +string tipoSangre
+  +string colorOjos
+  +int diasVacaciones
+  +Rol rol
+  +decimal creditos
+  +decimal puntos
+}
+class Pelicula {
+  +UUID id
+  +string nombre
+  +string sinopsis
+  +int duracion
+  +date fechaEstreno
+  +decimal precioBase
+  +decimal precioPreventa
+  +int restriccionEdad
+  +string[] generos
+  +string[] formatos
+  +string[] idiomas
+  +string imagen
+}
+class Sala {
+  +UUID id
+  +string nombre
+  +int capacidad
+}
+class Funcion {
+  +UUID id
+  +UUID peliculaId
+  +UUID salaId
+  +datetime fechaHoraInicio
+  +datetime fechaHoraFin
+}
+class Reserva {
+  +UUID id
+  +UUID funcionId
+  +UUID usuarioId
+  +UUID sesionId
+  +decimal total
+  +string metodoPago
+  +decimal descuento
+  +string tipoDescuento
+  +string codigoCupon
+  +datetime creadaEn
+  +datetime canceladaEn
+  +int entradasCompradas
+  +boolean entradasRetiradas
+  +boolean candyRetirado
+  +decimal creditosUsados
+  +decimal importeExterno
+  +decimal puntosGanados
+}
+class ReservaAsiento {
+  +UUID id
+  +UUID reservaId
+  +string butacaId
+  +string tipo
+}
+class ReservaCandy {
+  +UUID id
+  +UUID reservaId
+  +UUID itemId
+  +string tipoItem
+  +int cantidad
+  +decimal precio
+}
+class ButacaBloqueada {
+  +UUID funcionId
+  +string butacaId
+  +UUID sesionId
+  +datetime expiraEn
+}
+class CandyCategoria {
+  +UUID id
+  +string nombre
+}
+class CandyProducto {
+  +UUID id
+  +string nombre
+  +decimal precio
+  +UUID categoriaId
+  +int stock
+  +string imagen
+}
+class CandyCombo {
+  +UUID id
+  +string nombre
+  +string descripcion
+  +decimal precioCombo
+  +string imagen
+}
+class CandyComboItem {
+  +UUID id
+  +UUID comboId
+  +UUID productoId
+  +int cantidad
+}
+class ConfiguracionDescuentos {
+  +boolean primeraCompraActiva
+  +string codigoPrimeraCompra
+  +decimal descuentoPrimeraCompra
+  +boolean mayores50Activos
+  +int edadMinima
+  +decimal descuentoMayores50
+  +decimal valorPuntoPesos
+}
+class MovimientoCreditos {
+  +UUID id
+  +UUID usuarioId
+  +UUID reservaId
+  +string tipo
+  +decimal importe
+  +datetime creadoEn
+}
+class MovimientoPuntos {
+  +UUID id
+  +UUID usuarioId
+  +UUID reservaId
+  +string tipo
+  +decimal puntos
+  +decimal creditosGenerados
+  +datetime creadoEn
+}
+class ResenaPelicula {
+  +UUID id
+  +UUID usuarioId
+  +UUID peliculaId
+  +int puntuacion
+  +string comentario
+  +datetime creadaEn
+  +datetime actualizadaEn
+}
+class LogAuditoria {
+  +long id
+  +datetime ocurridoEn
+  +UUID usuarioId
+  +string usuarioNombre
+  +string accion
+  +string entidad
+  +string registroId
+  +string descripcion
+}
+
+AuthUser "1" --> "0..1" Perfil : tiene
+Perfil --> Rol
+Pelicula "1" --> "0..*" Funcion : programa
+Sala "1" --> "0..*" Funcion : asignada a
+Funcion "1" --> "0..*" Reserva : corresponde
+AuthUser "0..1" --> "0..*" Reserva : usuario registrado
+Reserva "1" *-- "1..*" ReservaAsiento : contiene
+Funcion "1" --> "0..*" ButacaBloqueada : tiene bloqueos
+Reserva "1" *-- "0..*" ReservaCandy : incluye
+CandyCategoria "1" --> "0..*" CandyProducto : clasifica
+CandyCombo "1" *-- "1..*" CandyComboItem : contiene
+CandyProducto "1" --> "0..*" CandyComboItem : componente
+AuthUser "1" --> "0..*" MovimientoCreditos
+Reserva "1" --> "0..*" MovimientoCreditos
+AuthUser "1" --> "0..*" MovimientoPuntos
+Reserva "0..1" --> "0..*" MovimientoPuntos
+AuthUser "1" --> "0..*" ResenaPelicula
+Pelicula "1" --> "0..*" ResenaPelicula
+AuthUser "0..1" --> "0..*" LogAuditoria : actor
+```
+
 ## Comandos disponibles
 
 | Comando         | Descripción                                                         |

@@ -154,6 +154,20 @@ create table if not exists public.butacas_bloqueadas (
 
 create index if not exists butacas_bloqueadas_expira_en_idx on public.butacas_bloqueadas(expira_en);
 
+do $$
+begin
+  if exists (select 1 from pg_publication where pubname = 'supabase_realtime')
+     and not exists (
+       select 1 from pg_publication_tables
+       where pubname = 'supabase_realtime'
+         and schemaname = 'public'
+         and tablename = 'butacas_bloqueadas'
+     ) then
+    execute 'alter publication supabase_realtime add table public.butacas_bloqueadas';
+  end if;
+end;
+$$;
+
 create table if not exists public.configuracion_descuentos (
   id boolean primary key default true check (id),
   primera_compra_activa boolean not null default true,
